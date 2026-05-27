@@ -1,4 +1,5 @@
 import tailwindcss from "@tailwindcss/vite";
+import { env } from "node:process";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -18,6 +19,11 @@ export default defineNuxtConfig({
     fallback: "light",
   },
   css: ["~/assets/css/main.css"],
+  runtimeConfig: {
+    public: {
+      s3BucketUrl: env.S3_BUCKET_URL,
+    },
+  },
   eslint: {
     config: {
       standalone: false,

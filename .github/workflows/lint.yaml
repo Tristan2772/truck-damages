@@ -17,6 +17,12 @@ jobs:
       BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID}}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET}}
+      S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY}}
+      S3_ACCESS_SECRET: ${{ secrets.S3_ACCESS_SECRET}}
+      S3_ENDPOINT: ${{secrets.S3_ENDPIONT}}
+      S3_REGION: ${{secrets.S3_REGION}}
+      S3_BUCKET: ${{secrets.S3_BUCKET}}
+      S3_BUCKET_URL: ${{secrets.S3_BUCKET_URL}}
     steps:
       - uses: actions/checkout@v5
       - name: Use Node.js

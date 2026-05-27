@@ -60,6 +60,11 @@ watch(note, () => {
   isExpanded.value = false;
   nextTick(checkOverflow);
 });
+watch(isExpanded, (val) => {
+  if (!val && descriptionRef.value) {
+    descriptionRef.value.scrollTop = 0;
+  }
+});
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", checkOverflow);
@@ -79,10 +84,9 @@ onBeforeUnmount(() => {
     </div>
     <div v-if="route.name === 'dashboard-jars-slug-id' && note && !loading">
       <div class="flex pb-40">
-        <!-- -------------------------------z index issue---------------------------- ---------------- -->
         <div class="flex flex-col gap-2 items-center text-center fixed bottom-0 pt-20 z-10 transition-all duration-300 pointer-events-none max-h-[80vh]" :class="{ 'left-16': !sidebarStore.isSidebarOpen, 'left-64': sidebarStore.isSidebarOpen, 'right-3': !isExpanded }">
-          <div class="w-full pointer-events-auto flex flex-col gap-2 justify-center items-center pt-5 bg-linear-to-b from-transparent to-base-300" :class="isExpanded ? 'to-10%' : 'to-20%' ">
-            <h2 class="text-2xl flex items-center gap-2 text-balance">
+          <div class="w-full pointer-events-auto flex flex-col gap-2 justify-center items-center pt-5 bg-linear-to-b from-transparent to-base-300" :class="isExpanded ? 'to-7%' : 'to-15%' ">
+            <h2 class="text-xl flex items-center gap-2 text-balance">
               <span :class="{ 'line-clamp-2': !isExpanded }">{{ note.name }}</span>
               <!-- ------ expansion button ------- -->
               <button
@@ -143,40 +147,30 @@ onBeforeUnmount(() => {
             </p>
             <p
               ref="descriptionRef"
-              class="text-sm min-h-14 pb-2 text-pretty"
-              :class="isExpanded ? 'overflow-y-auto max-h-54' : 'max-h-21 line-clamp-4'"
+              class="text-sm mb-4 text-pretty"
+              :class="isExpanded ? 'overflow-y-auto max-h-54' : 'max-h-20 line-clamp-4'"
             >
               {{ note.description }}
             </p>
           </div>
         </div>
-        <div class="p-4 flex w-full">
+        <div class="p-4 flex w-full gap-2 flex-wrap">
           <!-- ----------------if there are no images for this note ----------------------- -->
-          <!-- <div v-if="!jar.jarNotes.length" class="zig-zag bg-base-100 h-35">
+          <div v-if="!note.images.length" class="gbg-base-100 h-35">
             <div class="card-body text-center flex flex-col items-center justify-center gap-4">
-              <p class="text-lg max-h-fit">
-                Add a note to get started.
-              </p>
-              <NuxtLink :to="{ name: 'dashboard-jars-slug-add', params: { slug: route.params.slug } }" class="btn btn-secondary w-40">
-                Add Note
+              <NuxtLink :to="{ name: 'dashboard-jars-slug-id-images', params: { slug: route.params.slug, id: note.id } }" class="btn btn-secondary w-40">
+                Add Image
                 <Icon name="tabler:plus" size="24" />
               </NuxtLink>
             </div>
-          </div> -->
+          </div>
 
           <!-- ---------------------------- if there are images ---------------------------- -->
-          <!-- <div v-if="jar.jarNotes.length > 0" class="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4 w-full">
-            <AppJarNote
-              v-for="note in jar.jarNotes"
-              :key="note.id"
-              :note-id="note.id"
-              :name="note.name"
-              :description="note.description"
-              :started-at="note.startedAt"
-              :ended-at="note.endedAt"
-              class="transition-all duration-300"
+          <div v-if="note.images.length > 0" class="w-full">
+            <AppImageList
+              :images="note.images"
             />
-          </div> -->
+          </div>
         </div>
       </div>
     </div>
