@@ -118,6 +118,17 @@ effect(() => {
           },
         },
         component: "NoteSettingsIcon",
+      }, {
+        id: "link-note-pictures-edit",
+        label: "Manage Images",
+        to: {
+          name: "dashboard-jars-slug-id-images",
+          params: {
+            slug: route.params.slug,
+            id: route.params.id,
+          },
+        },
+        icon: "tabler:photo-cog",
       });
     }
   }

@@ -21,6 +21,13 @@ export async function findNote(noteId: number, userId: number) {
       eq(jarNotes.id, noteId),
       eq(jarNotes.userId, userId),
     ),
+    with: {
+      images: {
+        orderBy(fields, operators) {
+          return operators.desc(fields.createdAt);
+        },
+      },
+    },
   });
 }
 

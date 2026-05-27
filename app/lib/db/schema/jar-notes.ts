@@ -3,7 +3,10 @@ import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import z from "zod";
 
+import type { SelectJarNoteImage } from "./jar-note-images";
+
 import { user } from "./auth";
+import { jarNoteImages } from "./jar-note-images";
 import { jars } from "./jars";
 
 export const jarNotes = sqliteTable("jarNotes", {
@@ -17,13 +20,6 @@ export const jarNotes = sqliteTable("jarNotes", {
   createdAt: int().notNull().$default(() => Date.now()),
   updatedAt: int().notNull().$default(() => Date.now()).$onUpdate(() => Date.now()),
 });
-
-export const JarNotesRelations = relations(jarNotes, ({ one }) => ({
-  jar: one(jars, {
-    fields: [jarNotes.jarId],
-    references: [jars.id],
-  }),
-}));
 
 const BaseInsertJarNote = createInsertSchema(jarNotes, {
   name: z.string().min(1).max(100),
@@ -51,5 +47,16 @@ export const InsertJarNote = BaseInsertJarNote.superRefine((values, context) => 
   }
 });
 
+export const JarNotesRelations = relations(jarNotes, ({ one, many }) => ({
+  jar: one(jars, {
+    fields: [jarNotes.jarId],
+    references: [jars.id],
+  }),
+  images: many(jarNoteImages),
+}));
+
 export type SelectJarNote = typeof jarNotes.$inferSelect;
 export type InsertJarNote = z.infer<typeof InsertJarNote>;
+export type SelectJarNoteWithImages = SelectJarNote & {
+  images: SelectJarNoteImage[];
+};
