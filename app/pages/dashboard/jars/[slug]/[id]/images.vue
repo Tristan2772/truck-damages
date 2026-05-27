@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { FetchError } from "ofetch";
 
+import type { SelectJarNoteImage } from "~/lib/db/schema";
+
 const jarStore = useJarsStore();
 const { currentNote: note } = storeToRefs(jarStore);
 
@@ -106,6 +108,41 @@ async function uploadImage() {
   });
   previewImage.src = previewUrl.value;
 }
+
+const isOpen = ref(false);
+const deletingImage = ref<SelectJarNoteImage | null>(null);
+const isDeleting = ref(false);
+
+function onDialogClose() {
+  deletingImage.value = null;
+  isOpen.value = false;
+}
+
+function deleteImage(image: SelectJarNoteImage) {
+  deletingImage.value = image;
+  isOpen.value = true;
+}
+
+async function confirmDelete() {
+  if (!deletingImage.value) {
+    return;
+  }
+  isOpen.value = false;
+  try {
+    errorMessage.value = "";
+    isDeleting.value = true;
+    await $fetch(`/api/jars/${route.params.slug}/${route.params.id}/image/${deletingImage.value?.id}`, {
+      method: "DELETE",
+    });
+    await jarStore.currentNoteRefresh();
+  }
+  catch (e) {
+    const error = e as FetchError;
+    errorMessage.value = getFetchErrorMessage(error);
+  }
+  isDeleting.value = false;
+  deletingImage.value = null;
+}
 </script>
 
 <template>
@@ -153,7 +190,32 @@ async function uploadImage() {
     <div v-if="note && note.images.length > 0" class="w-full">
       <AppImageList
         :images="note.images"
-      />
+      >
+        <template #default="{ image: item }">
+          <button
+            :disabled="deletingImage === item && isDeleting"
+            class="btn btn-error btn-xs w-full"
+            @click="deleteImage(item)"
+          >
+            Delete
+            <div v-if="deletingImage === item && isDeleting" />
+            <Icon
+              v-if="!isDeleting && deletingImage !== item"
+              name="tabler:trash-x-filled"
+              size="18"
+            />
+          </button>
+        </template>
+      </AppImageList>
     </div>
+    <AppDialog
+      :is-open="isOpen"
+      title="Are you sure?"
+      description="Deleting this image cannot be undone. Are you sure you want to do this?"
+      confirm-class="btn-error"
+      confirm-label="Yes, Delete this Image."
+      @on-closed="onDialogClose"
+      @on-confirmed="confirmDelete"
+    />
   </div>
 </template>

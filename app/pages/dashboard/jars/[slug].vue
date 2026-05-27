@@ -150,7 +150,7 @@ onBeforeUnmount(() => {
             </h2>
             <p
               ref="descriptionRef"
-              class="text-sm mb-4 text-pretty"
+              class="text-sm mb-4 p-2 text-pretty"
               :class="isExpanded ? 'overflow-y-auto max-h-54' : 'max-h-20 line-clamp-4'"
             >
               {{ jar.description }}
@@ -172,7 +172,7 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- ---------------------------- if there are notes ---------------------------- -->
-          <div v-if="jar.jarNotes.length > 0" class="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4 w-full">
+          <div v-if="jar.jarNotes.length > 0" class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 w-full">
             <AppJarNote
               v-for="note in jar.jarNotes"
               :key="note.id"

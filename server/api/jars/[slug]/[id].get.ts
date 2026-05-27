@@ -6,8 +6,8 @@ import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-
 
 export default defineAuthenticatedEventHandler(async (event) => {
   const slug = getRouterParam(event, "slug") as string;
-  const jar = await findJar(slug, event.context.user.id);
   const id = getRouterParam(event, "id") as string;
+  const jar = await findJar(slug, event.context.user.id);
 
   if (!jar) {
     return sendError(event, createError({

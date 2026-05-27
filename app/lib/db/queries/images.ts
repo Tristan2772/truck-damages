@@ -1,3 +1,5 @@
+import { and, eq } from "drizzle-orm";
+
 import type { InsertJarNoteImage } from "../schema";
 
 import db from "..";
@@ -15,4 +17,14 @@ export async function insertJarNoteImage(
   }).returning();
 
   return inserted;
+}
+
+export async function deleteJarNoteImage(imageId: number, userId: number) {
+  const [deleted] = await db.delete(jarNoteImages).where(
+    and(
+      eq(jarNoteImages.id, imageId),
+      eq(jarNoteImages.userId, userId),
+    ),
+  ).returning();
+  return deleted;
 }
