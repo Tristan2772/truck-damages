@@ -33,7 +33,7 @@ onBeforeRouteUpdate((to) => {
 </script>
 
 <template>
-  <div class="container max-w-md mx-auto">
+  <div class="container max-w-md mx-auto p-2">
     <div class="my-4">
       <h1 class="text-lg">
         Edit Shelf
