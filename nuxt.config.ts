@@ -14,6 +14,7 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@vee-validate/nuxt",
     "nuxt-csurf",
+    "nuxt-easy-lightbox",
     "@sentry/nuxt/module",
   ],
 
