@@ -12,17 +12,32 @@ function hasSlotContent(image: SelectJarNoteImage): boolean {
   const nodes = slots.default?.({ image }) ?? [];
   return nodes.length > 0;
 }
+
+const visibleRef = ref(false);
+const indexRef = ref(0);
+
+const imgs = computed(() => props.images.map(image => `${config.public.s3BucketUrl}/${image.key}`));
+
+function showImg(index: number) {
+  indexRef.value = index;
+  visibleRef.value = true;
+}
+const onHide = () => (visibleRef.value = false);
 </script>
 
 <template>
   <div class="w-full grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
     <div
-      v-for="image in props.images"
+      v-for="(image, index) in props.images"
       :key="image.id"
       class="card card-compact h-40 flex items-center justify-center bg-base-300 relative"
+      @click="() => showImg(index)"
     >
       <img
         class="size-full object-cover"
+        :class="{
+          'cursor-pointer': !hasSlotContent(image),
+        }"
         :src="`${config.public.s3BucketUrl}/${image.key}`"
       >
       <div
@@ -32,5 +47,11 @@ function hasSlotContent(image: SelectJarNoteImage): boolean {
         <slot :image />
       </div>
     </div>
+    <VueEasyLightbox
+      :visible="visibleRef"
+      :imgs="imgs"
+      :index="indexRef"
+      @hide="onHide"
+    />
   </div>
 </template>
