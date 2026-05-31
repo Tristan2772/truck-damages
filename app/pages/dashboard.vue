@@ -148,12 +148,11 @@ effect(() => {
       />
 
       <div
-        class="bg-base-100 transition-all duration-300 top-16 fixed bottom-0 left-0 z-50 flex flex-col"
+        class="bg-base-100 transition-all duration-300 top-0 fixed bottom-0 left-0 z-50 flex flex-col"
         :class="{ 'min-w-64 max-w-64': sidebarStore.isSidebarOpen, 'min-w-16 max-w-16': !sidebarStore.isSidebarOpen }"
-        @touchmove.stop
-        @wheel.stop
       >
         <!-- ------------------------- top of Sidebar ------------------------------ -->
+        <div class="w-full h-16" />
         <div
           class="flex p-2 rounded-lg hover:bg-base-300 hover:cursor-pointer shrink-0"
           :class="{ 'justify-center': !sidebarStore.isSidebarOpen, 'justify-end': sidebarStore.isSidebarOpen }"
