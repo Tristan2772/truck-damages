@@ -46,6 +46,7 @@ const addJarTo = computed(() => {
             name: 'dashboard-jars-slug',
             params: { slug: jar.slug },
           }"
+          :aria-label="`link to ${jar.name}`"
           class="flex flex-col card-compact max-h-75 min-h-75 aspect-square rounded-full p-3 border-2 border-solid"
           :class="jarsStore.hoveredId === `jar-${jar.id}` ? 'border-primary bg-base-300' : 'bg-base-100' "
           @mouseenter="jarsStore.hoveredId = `jar-${jar.id}`"
@@ -93,11 +94,13 @@ const addJarTo = computed(() => {
 
 <style scoped>
 .jar-header::before {
-  content: "______________________ _________________________";
-  color: gray;
+  content: "";
   position: absolute;
   left: 0;
   right: 0;
   top: 2px;
+  height: 0.6rem;
+  background: repeating-linear-gradient(to right, gray 0, gray 0.5rem, transparent 0.5rem, transparent 0.75rem);
+  pointer-events: none;
 }
 </style>

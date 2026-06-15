@@ -3,6 +3,14 @@ import { env } from "node:process";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  app: {
+    head: {
+      link: [
+        { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+        { rel: "alternate icon", href: "/favicon.ico" },
+      ],
+    },
+  },
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   debug: true,

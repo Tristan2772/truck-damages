@@ -50,6 +50,7 @@ function hidePopover() {
   <div @mouseenter="showPopover" @mouseleave="hidePopover">
     <NuxtLink
       :to="props.link || props.to"
+      :aria-label="`link to ${props.label}`"
       class="btn btn-ghost gap-2 p-2 bg-base-100 hover:bg-base-300 w-full flex"
       :class="{ 'bg-base-200': route.path === props.link || (props.to ? route.path === router.resolve(props.to).path : false), 'bg-base-300': isHoveredJar, 'justify-center': !showLabel, 'justify-start': showLabel }"
       :style="`anchor-name:--anchor-${linkId}`"
@@ -76,7 +77,7 @@ function hidePopover() {
       v-if="supportsHover"
       :id="`popover-${linkId}`"
       ref="popover"
-      class="max-w-52 rounded-box shadow-sm p-2 text-sm text-gray-300"
+      class="max-w-52 rounded-box shadow-sm p-2 text-sm text-gray-200"
       popover
       :style="`position-anchor:--anchor-${linkId};background-color:var(--color-neutral);`"
     >
