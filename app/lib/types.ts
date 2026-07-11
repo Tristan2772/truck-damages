@@ -1,5 +1,3 @@
-import type { jars } from "~/lib/db/schema/jars";
-
 import type { userWithId } from "./auth";
 
 declare module "h3" {
@@ -8,5 +6,3 @@ declare module "h3" {
     user?: userWithId;
   }
 }
-
-export type Jar = typeof jars.$inferSelect;
