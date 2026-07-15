@@ -7,10 +7,10 @@ const authStore = useAuthStore();
     <div class="hero-content text-center min-h-96">
       <div class="max-w-md">
         <h1 class="text-5xl font-bold">
-          Grateful Truck
+          Truck Damages
         </h1>
         <p class="py-6">
-          Write out what you are grateful for and collect those memories in grateful Trucks. Come back to remind yourself that there is plenty to be grateful for!
+          View damages already reported to your truck or create a new report to detail new damages.
         </p>
         <AppAuthButton v-if="!authStore.user" />
         <NuxtLink
@@ -18,8 +18,8 @@ const authStore = useAuthStore();
           to="/dashboard"
           class="btn btn-secondary"
         >
-          <AppJarsGroupIcon />
-          View Trucks
+          <Icon name="tabler:truck" size="24" />
+          View Truck Damages
         </NuxtLink>
       </div>
     </div>

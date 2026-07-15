@@ -1,5 +1,5 @@
 {
-  "name": "grateful-jar",
+  "name": "truck-damages",
   "type": "module",
   "private": true,
   "scripts": {
@@ -30,11 +30,9 @@
     "better-auth": "^1.5.5",
     "drizzle-orm": "^0.45.1",
     "drizzle-zod": "^0.8.3",
-    "nanoid": "^5.1.7",
     "nuxt": "^4.2.2",
     "nuxt-csurf": "^1.6.5",
     "nuxt-easy-lightbox": "^1.1.0",
-    "slug": "^11.0.1",
     "tailwindcss": "^4.1.18",
     "vee-validate": "^4.15.1",
     "vue": "^3.5.26",
@@ -45,7 +43,6 @@
     "@antfu/eslint-config": "^6.7.3",
     "@iconify-json/tabler": "^1.2.26",
     "@types/node": "^25.3.3",
-    "@types/slug": "^5.0.9",
     "@vue/language-core": "^2.0.0",
     "daisyui": "^5.5.19",
     "drizzle-kit": "^0.31.9",
