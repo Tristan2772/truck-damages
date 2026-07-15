@@ -1,72 +1,72 @@
 import { and, eq } from "drizzle-orm";
 
-import type { InsertJarNoteImage } from "../schema";
+import type { InsertTruckReportImage } from "../schema";
 
 import db from "..";
-import { jarNoteImages, jarNotes, jars } from "../schema";
+import { truckReportImages, truckReports, trucks } from "../schema";
 
-export async function insertJarNoteImage(
-  jarNoteId: number,
-  insertable: InsertJarNoteImage,
+export async function insertTruckReportImage(
+  truckReportId: number,
+  insertable: InsertTruckReportImage,
   userId: number,
 ) {
-  const [inserted] = await db.insert(jarNoteImages).values({
+  const [inserted] = await db.insert(truckReportImages).values({
     ...insertable,
     userId,
-    jarNoteId,
+    truckReportId,
   }).returning();
 
   return inserted;
 }
 
-export async function deleteJarNoteImage(imageId: number, userId: number) {
-  const [deleted] = await db.delete(jarNoteImages).where(
+export async function deleteTruckReportImage(imageId: number, userId: number) {
+  const [deleted] = await db.delete(truckReportImages).where(
     and(
-      eq(jarNoteImages.id, imageId),
-      eq(jarNoteImages.userId, userId),
+      eq(truckReportImages.id, imageId),
+      eq(truckReportImages.userId, userId),
     ),
   ).returning();
   return deleted;
 }
 
-export async function findJarNoteImageById(imageId: number, userId: number) {
-  return db.query.jarNoteImages.findFirst({
+export async function findTruckReportImageById(imageId: number, userId: number) {
+  return db.query.truckReportImages.findFirst({
     where: and(
-      eq(jarNoteImages.id, imageId),
-      eq(jarNoteImages.userId, userId),
+      eq(truckReportImages.id, imageId),
+      eq(truckReportImages.userId, userId),
     ),
   });
 }
 
-export async function findJarNoteImageKeysByNoteId(noteId: number, userId: number) {
+export async function findTruckReportImageKeysByReportId(reportId: number, userId: number) {
   const rows = await db.select({
-    key: jarNoteImages.key,
-  }).from(jarNoteImages).innerJoin(
-    jarNotes,
-    eq(jarNoteImages.jarNoteId, jarNotes.id),
+    key: truckReportImages.key,
+  }).from(truckReportImages).innerJoin(
+    truckReports,
+    eq(truckReportImages.truckReportId, truckReports.id),
   ).where(and(
-    eq(jarNotes.id, noteId),
-    eq(jarNotes.userId, userId),
-    eq(jarNoteImages.userId, userId),
+    eq(truckReports.id, reportId),
+    eq(truckReports.userId, userId),
+    eq(truckReportImages.userId, userId),
   ));
 
   return rows.map(row => row.key);
 }
 
-export async function findJarNoteImageKeysByJarSlug(slug: string, userId: number) {
+export async function findTruckReportImageKeysByTruckVin(vin: string, userId: number) {
   const rows = await db.select({
-    key: jarNoteImages.key,
-  }).from(jarNoteImages).innerJoin(
-    jarNotes,
-    eq(jarNoteImages.jarNoteId, jarNotes.id),
+    key: truckReportImages.key,
+  }).from(truckReportImages).innerJoin(
+    truckReports,
+    eq(truckReportImages.truckReportId, truckReports.id),
   ).innerJoin(
-    jars,
-    eq(jarNotes.jarId, jars.id),
+    trucks,
+    eq(truckReports.truckId, trucks.id),
   ).where(and(
-    eq(jars.slug, slug),
-    eq(jars.userId, userId),
-    eq(jarNotes.userId, userId),
-    eq(jarNoteImages.userId, userId),
+    eq(trucks.vin, vin),
+    eq(trucks.userId, userId),
+    eq(truckReports.userId, userId),
+    eq(truckReportImages.userId, userId),
   ));
 
   return rows.map(row => row.key);

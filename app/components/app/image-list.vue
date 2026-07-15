@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import type { SelectJarNoteImage } from "../../lib/db/schema";
+import type { SelectTruckReportImage } from "../../lib/db/schema";
 
 const props = defineProps<{
-  images: SelectJarNoteImage[];
+  images: SelectTruckReportImage[];
 }>();
 
 const config = useRuntimeConfig();
 const slots = useSlots();
 
-function hasSlotContent(image: SelectJarNoteImage): boolean {
+function hasSlotContent(image: SelectTruckReportImage): boolean {
   const nodes = slots.default?.({ image }) ?? [];
   return nodes.length > 0;
 }

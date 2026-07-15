@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "25d36b6a-1357-4d29-9f21-d95744ee6c15",
+  "id": "b09db4c9-354e-4bd2-94d9-64fc8feae3d4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "account": {
@@ -350,8 +350,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "jarNoteImages": {
-      "name": "jarNoteImages",
+    "truckReportImages": {
+      "name": "truckReportImages",
       "columns": {
         "id": {
           "name": "id",
@@ -367,8 +367,15 @@
           "notNull": true,
           "autoincrement": false
         },
-        "jar_note_id": {
-          "name": "jar_note_id",
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "truck_report_id": {
+          "name": "truck_report_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -398,12 +405,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "jarNoteImages_jar_note_id_jarNotes_id_fk": {
-          "name": "jarNoteImages_jar_note_id_jarNotes_id_fk",
-          "tableFrom": "jarNoteImages",
-          "tableTo": "jarNotes",
+        "truckReportImages_truck_report_id_truckReports_id_fk": {
+          "name": "truckReportImages_truck_report_id_truckReports_id_fk",
+          "tableFrom": "truckReportImages",
+          "tableTo": "truckReports",
           "columnsFrom": [
-            "jar_note_id"
+            "truck_report_id"
           ],
           "columnsTo": [
             "id"
@@ -411,9 +418,9 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "jarNoteImages_user_id_user_id_fk": {
-          "name": "jarNoteImages_user_id_user_id_fk",
-          "tableFrom": "jarNoteImages",
+        "truckReportImages_user_id_user_id_fk": {
+          "name": "truckReportImages_user_id_user_id_fk",
+          "tableFrom": "truckReportImages",
           "tableTo": "user",
           "columnsFrom": [
             "user_id"
@@ -429,8 +436,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "jarNotes": {
-      "name": "jarNotes",
+    "truckReports": {
+      "name": "truckReports",
       "columns": {
         "id": {
           "name": "id",
@@ -439,13 +446,6 @@
           "notNull": true,
           "autoincrement": true
         },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "description": {
           "name": "description",
           "type": "text",
@@ -453,22 +453,8 @@
           "notNull": false,
           "autoincrement": false
         },
-        "started_at": {
-          "name": "started_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "ended_at": {
-          "name": "ended_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "jar_id": {
-          "name": "jar_id",
+        "truck_id": {
+          "name": "truck_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -498,12 +484,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "jarNotes_jar_id_jars_id_fk": {
-          "name": "jarNotes_jar_id_jars_id_fk",
-          "tableFrom": "jarNotes",
-          "tableTo": "jars",
+        "truckReports_truck_id_trucks_id_fk": {
+          "name": "truckReports_truck_id_trucks_id_fk",
+          "tableFrom": "truckReports",
+          "tableTo": "trucks",
           "columnsFrom": [
-            "jar_id"
+            "truck_id"
           ],
           "columnsTo": [
             "id"
@@ -511,9 +497,9 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "jarNotes_user_id_user_id_fk": {
-          "name": "jarNotes_user_id_user_id_fk",
-          "tableFrom": "jarNotes",
+        "truckReports_user_id_user_id_fk": {
+          "name": "truckReports_user_id_user_id_fk",
+          "tableFrom": "truckReports",
           "tableTo": "user",
           "columnsFrom": [
             "user_id"
@@ -521,7 +507,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
@@ -529,8 +515,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "jars": {
-      "name": "jars",
+    "trucks": {
+      "name": "trucks",
       "columns": {
         "id": {
           "name": "id",
@@ -539,6 +525,13 @@
           "notNull": true,
           "autoincrement": true
         },
+        "vin": {
+          "name": "vin",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "name": {
           "name": "name",
           "type": "text",
@@ -546,110 +539,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "slug": {
-          "name": "slug",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "shelf": {
-          "name": "shelf",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "jars_slug_unique": {
-          "name": "jars_slug_unique",
-          "columns": [
-            "slug"
-          ],
-          "isUnique": true
-        },
-        "jars_name_userId_unique": {
-          "name": "jars_name_userId_unique",
-          "columns": [
-            "name",
-            "user_id"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {
-        "jars_shelf_shelves_id_fk": {
-          "name": "jars_shelf_shelves_id_fk",
-          "tableFrom": "jars",
-          "tableTo": "shelves",
-          "columnsFrom": [
-            "shelf"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        },
-        "jars_user_id_user_id_fk": {
-          "name": "jars_user_id_user_id_fk",
-          "tableFrom": "jars",
-          "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "shelves": {
-      "name": "shelves",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
+        "brand": {
+          "name": "brand",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -678,19 +569,18 @@
         }
       },
       "indexes": {
-        "shelves_name_userId_unique": {
-          "name": "shelves_name_userId_unique",
+        "trucks_vin_unique": {
+          "name": "trucks_vin_unique",
           "columns": [
-            "name",
-            "user_id"
+            "vin"
           ],
           "isUnique": true
         }
       },
       "foreignKeys": {
-        "shelves_user_id_user_id_fk": {
-          "name": "shelves_user_id_user_id_fk",
-          "tableFrom": "shelves",
+        "trucks_user_id_user_id_fk": {
+          "name": "trucks_user_id_user_id_fk",
+          "tableFrom": "trucks",
           "tableTo": "user",
           "columnsFrom": [
             "user_id"
