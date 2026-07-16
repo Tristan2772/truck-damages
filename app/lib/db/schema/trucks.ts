@@ -22,8 +22,8 @@ export const trucks = sqliteTable("trucks", {
 
 export const InsertTruck = createInsertSchema(trucks, {
   name: z.string().min(1).max(20),
-  brand: z.string(),
-  vin: z.string(),
+  brand: z.string().min(1),
+  vin: z.string().min(17).max(17),
 }).pick({
   name: true,
   brand: true,

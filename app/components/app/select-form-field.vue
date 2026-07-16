@@ -14,7 +14,7 @@ const { value, handleChange } = useField<number | null>(() => props.name);
 
 function onSelectChange(event: Event) {
   const target = event.target as HTMLSelectElement;
-  handleChange(target.value === "" ? null : Number(target.value));
+  handleChange(target.value);
 }
 </script>
 
@@ -26,18 +26,18 @@ function onSelectChange(event: Event) {
     <select
       class="select"
       :value="value"
+      :disabled="props.disabled"
       @change="onSelectChange"
     >
       <option value="">
-        No Brand
+        Select a brand
       </option>
-
       <option
         v-for="(brand, index) in brands"
         :key="index"
         :value="brand"
       >
-        {{ brand.toLocaleUpperCase }}
+        {{ brand }}
       </option>
     </select>
     <p v-if="props.error" class="fieldset-label text-error">
