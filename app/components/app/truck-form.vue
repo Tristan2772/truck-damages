@@ -36,13 +36,6 @@ const props = defineProps<{
       :error="errors.name"
       :disabled="loading"
     />
-    <AppFormField
-      label="Description"
-      name="description"
-      type="textarea"
-      :error="errors.description"
-      :disabled="loading"
-    />
     <AppSelectFormField
       label="Brand"
       name="brand"
