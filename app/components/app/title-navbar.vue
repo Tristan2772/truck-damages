@@ -7,7 +7,7 @@
     </div>
     <div class="flex-none flex">
       <AppThemeToggle />
-      <AppAuthButton />
+      <AppHamburgerMenu />
     </div>
   </div>
 </template>
