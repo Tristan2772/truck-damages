@@ -19,10 +19,8 @@ export async function findTruck(vin: string) {
   });
 }
 
-export async function findAllTrucks(userId: number) {
-  return db.query.trucks.findMany({
-    where: eq(trucks.userId, userId),
-  });
+export async function findAllTrucks() {
+  return db.query.trucks.findMany();
 }
 
 export async function findTruckByName(name: string) {
