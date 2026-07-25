@@ -23,7 +23,7 @@ function onSubmitComplete() {
         Add Report
       </h1>
       <p class="text-sm">
-        A report is a memory that you are grateful for.
+        Please check current reports to avoid reporting the same damage.
       </p>
     </div>
     <AppTruckReportForm

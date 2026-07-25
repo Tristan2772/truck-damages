@@ -6,7 +6,7 @@ import sendZodError from "~/utils/send-zod-error";
 
 export default defineAuthenticatedEventHandler(async (event) => {
   const vin = getRouterParam(event, "vin") as string;
-  const truck = await findTruck(vin, event.context.user.id);
+  const truck = await findTruck(vin);
   if (!truck) {
     return createError({
       statusCode: 404,

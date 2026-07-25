@@ -18,10 +18,11 @@ export const trucks = sqliteTable("trucks", {
   updatedAt: int().notNull().$default(() => Date.now()).$onUpdate(() => Date.now()),
 }, t => [
   unique().on(t.vin),
+  unique().on(t.name),
 ]);
 
 export const InsertTruck = createInsertSchema(trucks, {
-  name: z.string().min(1).max(20),
+  name: z.string().min(1).max(100),
   brand: z.string().min(1),
   vin: z.string().min(17).max(17),
 }).pick({

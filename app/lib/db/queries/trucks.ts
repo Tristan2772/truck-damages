@@ -25,10 +25,9 @@ export async function findAllTrucks(userId: number) {
   });
 }
 
-export async function findTruckByName(existing: InsertTruck) {
+export async function findTruckByName(name: string) {
   return db.query.trucks.findFirst({
-    where:
-      eq(trucks.name, existing.name),
+    where: eq(trucks.name, name),
   });
 }
 

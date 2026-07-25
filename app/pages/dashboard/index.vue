@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import { TRUCK_BRANDS } from "../../lib/constants";
+// import { TRUCK_BRANDS } from "../../lib/constants";
 
 const trucksStore = useTrucksStore();
 const { allTrucks, allTrucksStatus } = storeToRefs(trucksStore);
-const brands = TRUCK_BRANDS;
+// const brands = TRUCK_BRANDS;
 
-function getTrucksOnBrand(brand: string) {
-  return allTrucks.value?.filter(truck => truck.brand === brand);
-}
+// function getTrucksOnBrand(brand: string) {
+//   return allTrucks.value?.filter(truck => truck.brand === brand);
+// }
 onBeforeMount(() => {
   trucksStore.allTrucksRefresh();
 });
@@ -21,13 +21,13 @@ onBeforeMount(() => {
     <!-- ------------------------ if there are trucks -------------------------------- -->
     <div v-if="allTrucks && allTrucks.length > 0 && !(allTrucksStatus === 'pending')" class="flex flex-col">
       <h2 class="text-2xl p-1 bg-base-200">
-        Trucks
+        All Damages
       </h2>
       <AppBrandWithTrucks :trucks-list="allTrucks">
         All Trucks
       </AppBrandWithTrucks>
       <!-- ------------- All Brands ------------- -->
-      <div v-if="brands">
+      <!-- <div v-if="brands">
         <AppBrandWithTrucks
           v-for="(brand, index) in brands"
           :key="index"
@@ -35,7 +35,7 @@ onBeforeMount(() => {
         >
           {{ brand }}
         </AppBrandWithTrucks>
-      </div>
+      </div> -->
     </div>
 
     <!-- ------------------------ If there are no trucks ----------------------------- -->

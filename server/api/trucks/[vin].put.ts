@@ -1,4 +1,4 @@
-import { findTruckByVin, updateTruckByVin } from "~/lib/db/queries/trucks";
+import { findTruckByName, findTruckByVin, updateTruckByVin } from "~/lib/db/queries/trucks";
 import { InsertTruck } from "~/lib/db/schema";
 import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-handler";
 import sendZodError from "~/utils/send-zod-error";
@@ -15,7 +15,15 @@ export default defineAuthenticatedEventHandler(async (event) => {
   if (existingTruck && existingTruck.vin !== vin) {
     return createError({
       statusCode: 409,
-      statusMessage: "A truck with that vin already exists",
+      statusMessage: "A truck with that VIN already exists",
+    });
+  }
+
+  const existingTruckName = await findTruckByName(result.data.name);
+  if (existingTruckName && existingTruckName.vin !== vin) {
+    return createError({
+      statusCode: 409,
+      statusMessage: "A truck with that name already exists",
     });
   }
 

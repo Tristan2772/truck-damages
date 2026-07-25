@@ -2,7 +2,7 @@
 import type { FetchError } from "ofetch";
 
 const truckStore = useTrucksStore();
-const { currentTruck: truck, currentTruckError: error, currentTruckStatus: status, hoveredId } = storeToRefs(truckStore);
+const { currentTruck: truck, currentTruckError: error, currentTruckStatus: status } = storeToRefs(truckStore);
 const route = useRoute();
 const isOpen = ref(false);
 
@@ -34,10 +34,8 @@ async function confirmDelete() {
 }
 
 onMounted(() => {
-  window.addEventListener("resize", checkOverflow);
   setTimeout(() => {
     truckStore.currentTruckRefresh();
-    checkOverflow();
   }, 0);
 });
 
@@ -54,31 +52,6 @@ onBeforeRouteUpdate((to) => {
     }, 1);
   }
 });
-
-const descriptionRef = ref<HTMLParagraphElement | null>(null);
-const isOverflowing = ref(false);
-const isExpanded = ref(false);
-
-function checkOverflow() {
-  if (descriptionRef.value) {
-    isOverflowing.value = descriptionRef.value.scrollHeight > descriptionRef.value.clientHeight;
-  }
-}
-
-watch(truck, () => {
-  isExpanded.value = false;
-  nextTick(checkOverflow);
-});
-
-watch(isExpanded, (val) => {
-  if (!val && descriptionRef.value) {
-    descriptionRef.value.scrollTop = 0;
-  }
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener("resize", checkOverflow);
-});
 </script>
 
 <template>
@@ -93,29 +66,12 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <div v-if="route.name === 'dashboard-trucks-vin' && truck && !loading">
-      <div class="flex pb-40">
-        <div class="flex flex-col gap-2 items-center text-center fixed bottom-0 z-10 pt-20 transition-all duration-300 pointer-events-none max-h-[80vh]" :class="{ 'right-3': !isExpanded }">
-          <div class="w-full pointer-events-auto flex flex-col gap-2 justify-center items-center pt-5 bg-linear-to-b from-transparent to-base-300" :class="isExpanded ? 'to-7%' : 'to-15%' ">
+      <div class="flex flex-col">
+        <div class="flex flex-col gap-2 items-center text-left">
+          <div class="w-full flex flex-col gap-2 justify-center items-center pt-5">
             <h2 class="text-2xl flex items-center gap-2 text-balance">
-              <span :class="{ 'line-clamp-2': !isExpanded }">{{ truck.name }}</span>
-              <!-- ------ expansion button ------- -->
-              <button
-                v-if="isOverflowing"
-                class="btn btn-ghost hover:bg-base-100 p-2"
-                @click="isExpanded = !isExpanded"
-              >
-                <Icon
-                  v-if="!isExpanded"
-                  size="18"
-                  name="tabler:layout-bottombar-expand-filled"
-                />
-                <Icon
-                  v-if="isExpanded"
-                  size="18"
-                  name="tabler:layout-navbar-expand-filled"
-                />
-              </button>
-              <div class="dropdown dropdown-top dropdown-end">
+              <span>{{ truck.name }}</span>
+              <div class="dropdown dropdown-bottom dropdown-end">
                 <div
                   tabindex="0"
                   role="button"
@@ -147,44 +103,36 @@ onBeforeUnmount(() => {
               </div>
             </h2>
             <p
-              ref="descriptionRef"
               class="text-sm mb-4 p-2 pb-0 text-pretty"
-              :class="isExpanded ? 'overflow-y-auto max-h-54' : 'line-clamp-4'"
             >
-              {{ truck.description }}
+              {{ truck.vin }}
             </p>
           </div>
         </div>
-        <div class="p-4 flex w-full">
-          <!-- ----------------if there are no reports for this truck ----------------------- -->
-          <div v-if="!truck.truckReports.length" class="zig-zag bg-base-100 h-35">
-            <div class="card-body text-center flex flex-col items-center justify-center gap-4">
-              <p class="text-lg max-h-fit">
-                Add a report to get started.
-              </p>
-              <NuxtLink :to="{ name: 'dashboard-trucks-vin-add', params: { vin: route.params.vin } }" class="btn btn-secondary w-40">
-                Add Report
-                <Icon name="tabler:plus" size="24" />
-              </NuxtLink>
-            </div>
-          </div>
-
+        <div class="p-4 flex flex-col w-full gap-12">
           <!-- ---------------------------- if there are reports ---------------------------- -->
-          <div v-if="truck.truckReports.length > 0" class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4 w-full">
+          <div v-if="truck.truckReports.length > 0" class="flex flex-col gap-4 w-full">
             <AppTruckReport
               v-for="report in truck.truckReports"
               :key="report.id"
               :report-id="report.id"
               :name="report.name"
               :description="report.description"
-              :started-at="report.startedAt"
-              :ended-at="report.endedAt"
-              :is-hovered="hoveredId === `report-${report.id}`"
+              :started-at="report.createdAt"
               class="zig-zag transition-all duration-300"
-              :class="{ 'scale-105': hoveredId === `report-${report.id}` }"
-              @mouseenter="hoveredId = `report-${report.id}`"
-              @mouseleave="hoveredId = ''"
             />
+          </div>
+
+          <div class="bg-base-100">
+            <div class="card-body text-center flex flex-col items-center justify-center gap-4">
+              <p class="text-lg max-h-fit">
+                Add a new damage report. After creating the report, you can add images to the report to visually document the damage.
+              </p>
+              <NuxtLink :to="{ name: 'dashboard-trucks-vin-reports-add', params: { vin: route.params.vin } }" class="btn btn-secondary w-40">
+                Add Report
+                <Icon name="tabler:plus" size="24" />
+              </NuxtLink>
+            </div>
           </div>
         </div>
       </div>

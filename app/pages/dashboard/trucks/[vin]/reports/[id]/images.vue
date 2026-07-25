@@ -148,7 +148,7 @@ async function confirmDelete() {
 <template>
   <div class="flex flex-col gap-2 p-2 items-start">
     <h2 class="text-lg text-center">
-      Manage "{{ report?.createdAt }}" Images
+      Manage "{{ formatDateYearLast(Number(report?.createdAt)) }}" Images
     </h2>
     <div class="flex flex-col gap-2 w-72 relative">
       <div class="bg-gray-500 h-30 w-full flex justify-center items-center p-2">

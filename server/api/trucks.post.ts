@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     return sendZodError(event, result.error);
   }
 
-  const existingTruckName = await findTruckByName(result.data);
+  const existingTruckName = await findTruckByName(result.data.name);
   if (existingTruckName) {
     return createError({
       statusCode: 409,

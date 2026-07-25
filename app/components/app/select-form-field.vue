@@ -1,14 +1,11 @@
 <script lang="ts" setup>
-import { TRUCK_BRANDS } from "~/lib/constants";
-
 const props = defineProps<{
+  options: string[];
   label: string;
   name: string;
   error?: string;
   disabled: boolean;
 }>();
-
-const brands = TRUCK_BRANDS;
 
 const { value, handleChange } = useField<number | null>(() => props.name);
 
@@ -30,14 +27,14 @@ function onSelectChange(event: Event) {
       @change="onSelectChange"
     >
       <option value="">
-        Select a brand
+        No selection
       </option>
       <option
-        v-for="(brand, index) in brands"
+        v-for="(option, index) in options"
         :key="index"
-        :value="brand"
+        :value="option"
       >
-        {{ brand }}
+        {{ option }}
       </option>
     </select>
     <p v-if="props.error" class="fieldset-label text-error">

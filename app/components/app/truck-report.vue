@@ -4,7 +4,6 @@ const props = defineProps<{
   name: string;
   description: string | null;
   startedAt: number;
-  endedAt: number;
   isHovered?: boolean;
 }>();
 
@@ -13,16 +12,13 @@ const route = useRoute();
 
 <template>
   <NuxtLink
-    :to="{ name: 'dashboard-trucks-vin-id', params: { vin: route.params.vin, id: props.reportId } }"
+    :to="{ name: 'dashboard-trucks-vin-reports-id', params: { vin: route.params.vin, id: props.reportId } }"
     class="group card-body bg-base-100 text-left flex flex-col items-left p-2 pb-6 min-h-32 sm:min-h-54 max-h-54 w-full overflow-y-hidden transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-base-300 focus-visible:bg-base-200"
     :aria-label="`link to ${props.name}`"
   >
     <div>
       <p class="text-sm italic text-gray-500">
-        <span v-if="props.startedAt !== props.endedAt">
-          {{ formatDateYearLast(props.startedAt) }} / {{ formatDateYearLast(props.endedAt) }}
-        </span>
-        <span v-else>
+        <span>
           {{ formatDateYearLast(props.startedAt) }}
         </span>
       </p>
