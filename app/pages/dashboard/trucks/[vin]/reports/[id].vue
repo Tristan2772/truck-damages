@@ -33,10 +33,8 @@ async function confirmDelete() {
 }
 
 onMounted(() => {
-  window.addEventListener("resize", checkOverflow);
   setTimeout(() => {
     truckStore.currentReportRefresh();
-    checkOverflow();
   }, 0);
 });
 
@@ -44,29 +42,6 @@ onBeforeRouteUpdate((to) => {
   if (to.name === "dashboard-location-vin-id") {
     truckStore.currentReportRefresh();
   }
-});
-
-const descriptionRef = ref<HTMLParagraphElement | null>(null);
-const isOverflowing = ref(false);
-const isExpanded = ref(false);
-
-function checkOverflow() {
-  if (descriptionRef.value) {
-    isOverflowing.value = descriptionRef.value.scrollHeight > descriptionRef.value.clientHeight;
-  }
-}
-watch(report, () => {
-  isExpanded.value = false;
-  nextTick(checkOverflow);
-});
-watch(isExpanded, (val) => {
-  if (!val && descriptionRef.value) {
-    descriptionRef.value.scrollTop = 0;
-  }
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener("resize", checkOverflow);
 });
 </script>
 
@@ -81,30 +56,21 @@ onBeforeUnmount(() => {
         <span>{{ errorMessage }}</span>
       </div>
     </div>
-    <div v-if="route.name === 'dashboard-trucks-vin-id' && report && !loading">
-      <div class="flex pb-40">
-        <div class="flex flex-col gap-2 items-center text-center fixed bottom-0 pt-20 z-10 transition-all duration-300 pointer-events-none max-h-[80vh]" :class="{ 'right-3': !isExpanded }">
-          <div class="w-full pointer-events-auto flex flex-col gap-2 justify-center items-center pt-5 bg-linear-to-b from-transparent to-base-300" :class="isExpanded ? 'to-7%' : 'to-15%' ">
-            <h2 class="text-xl flex items-center gap-2 text-balance">
-              <span :class="{ 'line-clamp-2': !isExpanded }">{{ report.name }}</span>
-              <!-- ------ expansion button ------- -->
-              <button
-                v-if="isOverflowing"
-                class="btn btn-ghost hover:bg-base-100 p-2"
-                @click="isExpanded = !isExpanded"
-              >
-                <Icon
-                  v-if="!isExpanded"
-                  size="18"
-                  name="tabler:layout-bottombar-expand-filled"
-                />
-                <Icon
-                  v-if="isExpanded"
-                  size="18"
-                  name="tabler:layout-navbar-expand-filled"
-                />
-              </button>
-              <div class="dropdown dropdown-top dropdown-end">
+    <div v-if="route.name === 'dashboard-trucks-vin-reports-id' && report && !loading">
+      <div class="flex flex-col">
+        <div class="w-full flex flex-col gap-2 items-center text-center z-10">
+          <div class="flex flex-col flex-1 gap-2 justify-center items-center pt-5">
+            <div class="flex gap-4 text-sm italic text-gray-500">
+              <p>{{ report.truckVin }}</p>
+              <p>
+                <span>
+                  {{ formatDateYearLast(report.createdAt) }}
+                </span>
+              </p>
+            </div>
+            <h2 class="w-full text-xl flex items-center gap-2 text-center">
+              <span class="w-full">{{ report.name }}</span>
+              <div class="dropdown dropdown-bottom dropdown-end">
                 <div
                   tabindex="0"
                   role="button"
@@ -116,7 +82,7 @@ onBeforeUnmount(() => {
                   <li>
                     <NuxtLink
                       :to="{
-                        name: 'dashboard-trucks-vin-id-edit',
+                        name: 'dashboard-trucks-vin-reports-id-edit',
                         params: {
                           vin: route.params.vin,
                           id: report.id,
@@ -136,44 +102,32 @@ onBeforeUnmount(() => {
                 </ul>
               </div>
             </h2>
-            <p class="text-sm italic text-gray-500">
-              <span v-if="report.startedAt !== report.endedAt">
-                {{ formatDateYearLast(report.startedAt) }} / {{ formatDateYearLast(report.endedAt) }}
-              </span>
-              <span v-else>
-                {{ formatDateYearLast(report.startedAt) }}
-              </span>
-            </p>
             <p
-              ref="descriptionRef"
               class="text-sm mb-4 p-2 pb-0 text-pretty"
-              :class="isExpanded ? 'overflow-y-auto max-h-54' : 'line-clamp-4'"
             >
               {{ report.description }}
             </p>
           </div>
         </div>
-        <div class="p-4 flex w-full gap-2 flex-wrap">
-          <!-- ----------------if there are no images for this report ----------------------- -->
-          <div v-if="!report.images.length" class="gbg-base-100 h-35">
-            <div class="card-body text-center flex flex-col items-center justify-center gap-4">
-              <NuxtLink :to="{ name: 'dashboard-trucks-vin-id-images', params: { vin: route.params.vin, id: report.id } }" class="btn btn-secondary w-40">
-                Add Image
-                <Icon name="tabler:plus" size="24" />
-              </NuxtLink>
-            </div>
-          </div>
-
+        <div class="p-4 flex w-full justify-center gap-2 flex-wrap">
           <!-- ---------------------------- if there are images ---------------------------- -->
           <div v-if="report.images.length > 0" class="w-full">
             <AppImageList
               :images="report.images"
             />
           </div>
+          <div>
+            <div class="w-full card-body text-center flex flex-col items-center justify-center gap-4">
+              <NuxtLink :to="{ name: 'dashboard-trucks-vin-reports-id-images', params: { vin: route.params.vin, id: report.id } }" class="btn btn-secondary w-60">
+                Add/Manage Images
+                <Icon name="tabler:plus" size="24" />
+              </NuxtLink>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <div v-if="route.name !== 'dashboard-trucks-vin-id' && report && status !== 'pending'">
+    <div v-if="route.name !== 'dashboard-trucks-vin-reports-id' && report && status !== 'pending'">
       <NuxtPage />
     </div>
     <AppDialog

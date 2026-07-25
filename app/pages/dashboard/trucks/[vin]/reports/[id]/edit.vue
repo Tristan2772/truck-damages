@@ -15,7 +15,7 @@ async function onSubmit(values: InsertTruckReport) {
 
 function onSubmitComplete() {
   navigateTo({
-    name: "dashboard-trucks-vin-id",
+    name: "dashboard-trucks-vin-reports-id",
     params: {
       vin: route.params.vin,
       id: route.params.id,

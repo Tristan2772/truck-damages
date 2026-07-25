@@ -65,8 +65,10 @@ CREATE TABLE `truckReportImages` (
 --> statement-breakpoint
 CREATE TABLE `truckReports` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`name` text NOT NULL,
 	`description` text,
 	`truck_id` integer NOT NULL,
+	`truck_vin` text NOT NULL,
 	`user_id` integer NOT NULL,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
@@ -85,4 +87,5 @@ CREATE TABLE `trucks` (
 	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `trucks_vin_unique` ON `trucks` (`vin`);
+CREATE UNIQUE INDEX `trucks_vin_unique` ON `trucks` (`vin`);--> statement-breakpoint
+CREATE UNIQUE INDEX `trucks_name_unique` ON `trucks` (`name`);

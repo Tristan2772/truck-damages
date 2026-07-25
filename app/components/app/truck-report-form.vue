@@ -9,8 +9,12 @@ const props = defineProps<{
   onSubmitComplete: () => void;
 }>();
 
+const route = useRoute();
+
 const defaultValues: InsertTruckReport = {
+  name: "",
   description: "",
+  truckVin: route.params.vin?.toString() || "",
 };
 
 const formInitialValues = computed(() => props.initialValues || defaultValues);
@@ -27,10 +31,22 @@ const formInitialValues = computed(() => props.initialValues || defaultValues);
     :submit-icon
   >
     <AppFormField
+      label="Name"
+      name="name"
+      :error="errors.name"
+      :disabled="loading"
+    />
+    <AppFormField
       label="Description"
       name="description"
       type="textarea"
       :error="errors.description"
+      :disabled="loading"
+    />
+    <AppFormField
+      label="Truck Vin"
+      name="truckVin"
+      :error="errors.truckVin"
       :disabled="loading"
     />
   </AppTruckBaseForm>

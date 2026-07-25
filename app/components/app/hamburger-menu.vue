@@ -56,29 +56,24 @@ onBeforeUnmount(() => {
     >
       <li>
         <NuxtLink to="/dashboard" @click="closeMenu">
-          Dashboard
+          All Damages
         </NuxtLink>
       </li>
       <hr>
       <!-- ---------------- TODO: make trucks link available only for managers -->
       <li>
-        <NuxtLink to="/dashboard/trucks/add" @click="closeMenu">
+        <NuxtLink to="/dashboard/add-truck" @click="closeMenu">
           Add Truck
         </NuxtLink>
       </li>
       <hr>
-      <li>
-        <NuxtLink to="/dashboard/trucks/reports/add" @click="closeMenu">
-          New Report
-        </NuxtLink>
-      </li>
-      <hr>
-      <li>
+      <!-- ---------- TODO: add a page to see all of a users specific reports to edit them -->
+      <!-- <li>
         <NuxtLink to="/my-reports" @click="closeMenu">
           My Reports
         </NuxtLink>
       </li>
-      <hr>
+      <hr> -->
       <li>
         <NuxtLink to="/sign-out" @click="closeMenu">
           Logout

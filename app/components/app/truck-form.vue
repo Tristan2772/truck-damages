@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { TRUCK_BRANDS } from "~/lib/constants";
 import { InsertTruck } from "~/lib/db/schema";
 
 const props = defineProps<{
@@ -39,6 +40,7 @@ const props = defineProps<{
     <AppSelectFormField
       label="Brand"
       name="brand"
+      :options="TRUCK_BRANDS"
       :error="errors.brand"
       :disabled="loading"
     />

@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "b09db4c9-354e-4bd2-94d9-64fc8feae3d4",
+  "id": "117da068-088e-4a47-a9a2-c3cfe2147163",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "account": {
@@ -446,6 +446,13 @@
           "notNull": true,
           "autoincrement": true
         },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "description": {
           "name": "description",
           "type": "text",
@@ -456,6 +463,13 @@
         "truck_id": {
           "name": "truck_id",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "truck_vin": {
+          "name": "truck_vin",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -573,6 +587,13 @@
           "name": "trucks_vin_unique",
           "columns": [
             "vin"
+          ],
+          "isUnique": true
+        },
+        "trucks_name_unique": {
+          "name": "trucks_name_unique",
+          "columns": [
+            "name"
           ],
           "isUnique": true
         }

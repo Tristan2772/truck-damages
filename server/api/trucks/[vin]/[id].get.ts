@@ -7,7 +7,7 @@ import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-
 export default defineAuthenticatedEventHandler(async (event) => {
   const vin = getRouterParam(event, "vin") as string;
   const id = getRouterParam(event, "id") as string;
-  const truck = await findTruck(vin, event.context.user.id);
+  const truck = await findTruck(vin);
 
   if (!truck) {
     return createError({
