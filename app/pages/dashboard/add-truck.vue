@@ -22,7 +22,7 @@ function onSubmitComplete() {
         Add Truck
       </h1>
       <p class="text-sm">
-        A truck is a collection of your memories that you are grateful for. You can add a date and some pictures to each memory to help you best remember what you are grateful for.
+        Add a new truck to report damages on.
       </p>
     </div>
     <AppTruckForm
