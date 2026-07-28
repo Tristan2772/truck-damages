@@ -15,11 +15,10 @@ export async function insertTruckReport(truckId: number, insertable: InsertTruck
   return inserted;
 }
 
-export async function findReport(reportId: number, userId: number) {
+export async function findReport(reportId: number) {
   return db.query.truckReports.findFirst({
     where: and(
       eq(truckReports.id, reportId),
-      eq(truckReports.userId, userId),
     ),
     with: {
       images: {

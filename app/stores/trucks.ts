@@ -1,4 +1,4 @@
-import type { SelectTruck, SelectTruckReportWithImages, SelectTruckWithReports } from "~/lib/db/schema";
+import type { SelectTruckReportWithImages, SelectTruckWithReportsAndImages } from "~/lib/db/schema";
 
 export const useTrucksStore = defineStore("useTrucksStore", () => {
   const route = useRoute();
@@ -6,11 +6,11 @@ export const useTrucksStore = defineStore("useTrucksStore", () => {
   const reportUrlWithVinAndId = computed(() => `/api/trucks/${route.params.vin}/${route.params.id}`);
 
   const { data: allTrucks, status: allTrucksStatus, refresh: allTrucksRefresh,
-  } = useFetch<SelectTruck[]>("/api/trucks", {
+  } = useFetch<SelectTruckWithReportsAndImages[]>("/api/trucks", {
     lazy: true,
   });
 
-  const { data: currentTruck, status: currentTruckStatus, error: currentTruckError, refresh: currentTruckRefresh } = useFetch<SelectTruckWithReports>(truckUrlWithVin, {
+  const { data: currentTruck, status: currentTruckStatus, error: currentTruckError, refresh: currentTruckRefresh } = useFetch<SelectTruckWithReportsAndImages>(truckUrlWithVin, {
     lazy: true,
     immediate: false,
     watch: false,

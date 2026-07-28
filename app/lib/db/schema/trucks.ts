@@ -3,7 +3,7 @@ import { int, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import type { SelectTruckReport } from "./truck-reports";
+import type { SelectTruckReport, SelectTruckReportWithImages } from "./truck-reports";
 
 import { user } from "./auth";
 import { truckReports } from "./truck-reports";
@@ -39,4 +39,7 @@ export type InsertTruck = z.infer<typeof InsertTruck>;
 export type SelectTruck = typeof trucks.$inferSelect;
 export type SelectTruckWithReports = SelectTruck & {
   truckReports: SelectTruckReport[];
+};
+export type SelectTruckWithReportsAndImages = SelectTruck & {
+  truckReports: SelectTruckReportWithImages[];
 };
