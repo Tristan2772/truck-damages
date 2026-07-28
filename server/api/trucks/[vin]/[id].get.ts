@@ -23,7 +23,7 @@ export default defineAuthenticatedEventHandler(async (event) => {
     });
   }
 
-  const report = await findReport(Number(id), event.context.user.id);
+  const report = await findReport(Number(id));
 
   if (!report) {
     return createError({

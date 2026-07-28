@@ -111,7 +111,7 @@ onBeforeRouteUpdate((to) => {
         </div>
         <div class="p-4 flex flex-col w-full gap-12">
           <!-- ---------------------------- if there are reports ---------------------------- -->
-          <div v-if="truck.truckReports.length > 0" class="flex flex-col gap-4 w-full">
+          <div v-if="truck.truckReports.length > 0" class="flex flex-col gap-8 w-full">
             <AppTruckReport
               v-for="report in truck.truckReports"
               :key="report.id"
@@ -119,6 +119,7 @@ onBeforeRouteUpdate((to) => {
               :name="report.name"
               :description="report.description"
               :started-at="report.createdAt"
+              :images="report.images"
               class="zig-zag transition-all duration-300"
             />
           </div>

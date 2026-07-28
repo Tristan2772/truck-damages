@@ -14,13 +14,35 @@ export async function findTruck(vin: string) {
         orderBy(fields, operators) {
           return operators.desc(fields.createdAt);
         },
+        with: {
+          images: {
+            orderBy(fields, operators) {
+              return operators.desc(fields.createdAt);
+            },
+          },
+        },
       },
     },
   });
 }
 
 export async function findAllTrucks() {
-  return db.query.trucks.findMany();
+  return db.query.trucks.findMany({
+    with: {
+      truckReports: {
+        orderBy(fields, operators) {
+          return operators.desc(fields.createdAt);
+        },
+        with: {
+          images: {
+            orderBy(fields, operators) {
+              return operators.desc(fields.createdAt);
+            },
+          },
+        },
+      },
+    },
+  });
 }
 
 export async function findTruckByName(name: string) {
