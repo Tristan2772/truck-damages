@@ -12,7 +12,10 @@ const authStore = useAuthStore();
         <p class="py-6">
           View damages already reported to your truck or create a new report to detail new damages.
         </p>
-        <AppAuthButton v-if="!authStore.user" />
+        <div v-if="authStore.loading" class="flex justify-center">
+          <span class="loading loading-spinner loading-lg" />
+        </div>
+        <AppAuthButton v-else-if="!authStore.user" />
         <NuxtLink
           v-if="authStore.user"
           to="/dashboard"

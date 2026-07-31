@@ -1,6 +1,4 @@
-import { createAuthClient } from "better-auth/vue";
-
-const authClient = createAuthClient();
+import { authClient } from "~/lib/auth-client";
 
 export const useAuthStore = defineStore("useAuthStore", () => {
   const session = ref<Awaited<ReturnType<typeof authClient.useSession>> | null>(null);
@@ -13,29 +11,71 @@ export const useAuthStore = defineStore("useAuthStore", () => {
   const user = computed(() => session.value?.data?.user);
   const loading = computed(() => session.value?.isPending);
 
-  async function signIn() {
+  function createCsrfHeaders() {
     const { csrf } = useCsrf();
     const headers = new Headers();
     headers.append("csrf-token", csrf);
+    return headers;
+  }
+
+  async function signInWithGoogle() {
     await authClient.signIn.social({
       provider: "google",
       callbackURL: "/dashboard",
       errorCallbackURL: "/error",
       fetchOptions: {
-        headers,
+        headers: createCsrfHeaders(),
       },
     });
+    await init();
+  }
+
+  async function signInWithEmail(credentials: { email: string; password: string }) {
+    const { error } = await authClient.signIn.email({
+      email: credentials.email,
+      password: credentials.password,
+      callbackURL: "/dashboard",
+      fetchOptions: {
+        headers: createCsrfHeaders(),
+      },
+    });
+
+    if (error) {
+      return error.message || error.statusMessage || "An unknown error occurred.";
+    }
+
+    await init();
+    await navigateTo("/dashboard");
+    return null;
+  }
+
+  async function signUpWithEmail(credentials: { name: string; email: string; password: string }) {
+    const { error } = await authClient.signUp.email({
+      name: credentials.name,
+      email: credentials.email,
+      password: credentials.password,
+      callbackURL: "/dashboard",
+      fetchOptions: {
+        headers: createCsrfHeaders(),
+      },
+    });
+
+    if (error) {
+      return error.message || error.statusMessage || "An unknown error occurred.";
+    }
+
+    await init();
+    await navigateTo("/dashboard");
+    return null;
   }
 
   async function signOut() {
-    const { csrf } = useCsrf();
-    const headers = new Headers();
-    headers.append("csrf-token", csrf);
     await authClient.signOut({
       fetchOptions: {
-        headers,
+        headers: createCsrfHeaders(),
       },
     });
+    session.value = null;
     navigateTo("/");
   }
 
@@ -43,7 +83,10 @@ export const useAuthStore = defineStore("useAuthStore", () => {
     init,
     user,
     loading,
-    signIn,
+    signIn: signInWithGoogle,
+    signInWithGoogle,
+    signInWithEmail,
+    signUpWithEmail,
     signOut,
   };
 });

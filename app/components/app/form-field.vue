@@ -4,7 +4,7 @@ import { Field } from "vee-validate";
 const props = defineProps<{
   label: string;
   name: string;
-  type?: "text" | "textarea";
+  type?: "text" | "password" | "textarea";
   error?: string;
   disabled: boolean;
 }>();
@@ -17,13 +17,13 @@ const props = defineProps<{
     </legend>
     <Field
       :disabled="disabled"
-      :as="type || 'input'"
+      :as="type === 'textarea' ? 'textarea' : 'input'"
       :name="name"
-      :type="type || 'text'"
+      :type="type && type !== 'textarea' ? type : 'text'"
       class="w-full"
       :class="{
         'input-error': props.error,
-        'input': !type || type === 'text',
+        'input': !type || type === 'text' || type === 'password',
         'textarea': type === 'textarea',
       }"
     />
