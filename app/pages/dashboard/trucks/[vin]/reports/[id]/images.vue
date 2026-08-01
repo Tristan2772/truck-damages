@@ -3,8 +3,28 @@ import { FetchError } from "ofetch";
 
 import type { SelectTruckReportImage } from "~/lib/db/schema";
 
+import { isManagerEmail } from "~/utils/permissions";
+
 const truckStore = useTrucksStore();
 const { currentReport: report } = storeToRefs(truckStore);
+const authStore = useAuthStore();
+
+const isManager = computed(() => isManagerEmail(authStore.user?.email));
+const canUploadImages = computed(() => {
+  if (!report.value || !authStore.user) {
+    return false;
+  }
+
+  return isManager.value || Number(authStore.user.id) === report.value.userId;
+});
+
+function canDeleteImage(image: SelectTruckReportImage) {
+  if (!authStore.user) {
+    return false;
+  }
+
+  return isManager.value || Number(authStore.user.id) === image.userId;
+}
 
 const { $csrfFetch } = useNuxtApp();
 const route = useRoute();
@@ -150,7 +170,7 @@ async function confirmDelete() {
     <h2 class="text-lg text-center">
       Manage "{{ formatDateYearLast(Number(report?.createdAt)) }}" Images
     </h2>
-    <div class="flex flex-col gap-2 w-72 relative">
+    <div v-if="canUploadImages" class="flex flex-col gap-2 w-72 relative">
       <div class="bg-gray-500 h-30 w-full flex justify-center items-center p-2">
         <p v-if="!previewUrl" class="text-center text-white">
           Select an image
@@ -187,12 +207,17 @@ async function confirmDelete() {
         />
       </button>
     </div>
+    <div v-else class="alert alert-warning">
+      <span>Only managers and the report owner can add or edit images for this report.</span>
+    </div>
     <div v-if="report && report.images.length > 0" class="w-full">
       <AppImageList
         :images="report.images"
+        :enable-lightbox="false"
       >
         <template #default="{ image: item }">
           <button
+            v-if="canDeleteImage(item)"
             :disabled="deletingImage === item && isDeleting"
             class="btn btn-error btn-xs w-full"
             @click="deleteImage(item)"

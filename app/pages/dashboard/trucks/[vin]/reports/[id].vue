@@ -1,14 +1,25 @@
 <script lang="ts" setup>
 import type { FetchError } from "ofetch";
 
+import { isManagerEmail } from "~/utils/permissions";
+
 const route = useRoute();
 const truckStore = useTrucksStore();
+const authStore = useAuthStore();
 const { currentReport: report, currentReportError: error, currentReportStatus: status } = storeToRefs(truckStore);
 const isOpen = ref(false);
 const isDeleting = ref(false);
 const deleteError = ref("");
 const loading = computed(() => status.value === "pending" || isDeleting.value);
 const errorMessage = computed(() => error.value?.statusMessage || deleteError.value);
+const isManager = computed(() => isManagerEmail(authStore.user?.email));
+const canManageReport = computed(() => {
+  if (!report.value || !authStore.user) {
+    return false;
+  }
+
+  return isManager.value || Number(authStore.user.id) === report.value.userId;
+});
 
 function openDialog() {
   isOpen.value = true;
@@ -70,7 +81,7 @@ onBeforeRouteUpdate((to) => {
             </div>
             <h2 class="w-full text-xl flex items-center gap-2 text-center">
               <span class="w-full">{{ report.name }}</span>
-              <div class="dropdown dropdown-bottom dropdown-end">
+              <div v-if="canManageReport" class="dropdown dropdown-bottom dropdown-end">
                 <div
                   tabindex="0"
                   role="button"
@@ -114,9 +125,10 @@ onBeforeRouteUpdate((to) => {
           <div v-if="report.images.length > 0" class="w-full">
             <AppImageList
               :images="report.images"
+              :enable-lightbox="true"
             />
           </div>
-          <div>
+          <div v-if="canManageReport">
             <div class="w-full card-body text-center flex flex-col items-center justify-center gap-4">
               <NuxtLink :to="{ name: 'dashboard-trucks-vin-reports-id-images', params: { vin: route.params.vin, id: report.id } }" class="btn btn-secondary w-60">
                 Add/Manage Images

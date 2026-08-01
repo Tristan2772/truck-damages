@@ -66,18 +66,28 @@ export async function insertTruck(insertable: InsertTruck, vin: string, userId: 
   return created;
 }
 
-export async function updateTruckByVin(updates: InsertTruck, vin: string, userId: number) {
-  const [updated] = await db.update(trucks).set(updates).where(and(
+export async function updateTruckByVin(updates: InsertTruck, vin: string, userId?: number) {
+  const conditions = [
     eq(trucks.vin, vin),
-    eq(trucks.userId, userId),
-  )).returning();
+  ];
+
+  if (userId) {
+    conditions.push(eq(trucks.userId, userId));
+  }
+
+  const [updated] = await db.update(trucks).set(updates).where(and(...conditions)).returning();
   return updated;
 }
 
-export async function removeTruckByVin(vin: string, userId: number) {
-  const [deleted] = await db.delete(trucks).where(and(
+export async function removeTruckByVin(vin: string, userId?: number) {
+  const conditions = [
     eq(trucks.vin, vin),
-    eq(trucks.userId, userId),
-  )).returning();
+  ];
+
+  if (userId) {
+    conditions.push(eq(trucks.userId, userId));
+  }
+
+  const [deleted] = await db.delete(trucks).where(and(...conditions)).returning();
   return deleted;
 }

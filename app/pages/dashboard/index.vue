@@ -1,8 +1,11 @@
 <script lang="ts" setup>
 // import { TRUCK_BRANDS } from "../../lib/constants";
+import { isManagerEmail } from "~/utils/permissions";
 
 const trucksStore = useTrucksStore();
+const authStore = useAuthStore();
 const { allTrucks, allTrucksStatus } = storeToRefs(trucksStore);
+const isManager = computed(() => isManagerEmail(authStore.user?.email));
 // const brands = TRUCK_BRANDS;
 
 // function getTrucksOnBrand(brand: string) {
@@ -39,7 +42,7 @@ onBeforeMount(() => {
     </div>
 
     <!-- ------------------------ If there are no trucks ----------------------------- -->
-    <div v-if="!allTrucks?.length && !(allTrucksStatus === 'pending')" class="p-4">
+    <div v-if="!allTrucks?.length && !(allTrucksStatus === 'pending') && isManager" class="p-4">
       <div class="flex card-compact bg-base-300 max-h-65 min-h-65 aspect-square rounded-full p-3 border-2 border-dashed">
         <div class="card-body text-center flex flex-col items-center justify-center gap-4">
           <p class="text-xl max-h-fit">

@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import { isManagerEmail } from "~/utils/permissions";
+
 const isOpen = ref(false);
+const authStore = useAuthStore();
+
+const isManager = computed(() => isManagerEmail(authStore.user?.email));
 
 const menuRoot = useTemplateRef<HTMLDivElement>("menuRoot");
 
@@ -60,20 +65,18 @@ onBeforeUnmount(() => {
         </NuxtLink>
       </li>
       <hr>
-      <!-- ---------------- TODO: make trucks link available only for managers -->
       <li>
+        <NuxtLink to="/dashboard/my-reports" @click="closeMenu">
+          My Reports
+        </NuxtLink>
+      </li>
+      <hr>
+      <li v-if="isManager">
         <NuxtLink to="/dashboard/add-truck" @click="closeMenu">
           Add Truck
         </NuxtLink>
       </li>
       <hr>
-      <!-- ---------- TODO: add a page to see all of a users specific reports to edit them -->
-      <!-- <li>
-        <NuxtLink to="/my-reports" @click="closeMenu">
-          My Reports
-        </NuxtLink>
-      </li>
-      <hr> -->
       <li>
         <NuxtLink to="/sign-out" @click="closeMenu">
           Logout

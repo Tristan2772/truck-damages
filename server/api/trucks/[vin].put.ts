@@ -1,9 +1,17 @@
 import { findTruckByName, findTruckByVin, updateTruckByVin } from "~/lib/db/queries/trucks";
 import { InsertTruck } from "~/lib/db/schema";
 import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-handler";
+import { isManagerUser } from "~/utils/permissions";
 import sendZodError from "~/utils/send-zod-error";
 
 export default defineAuthenticatedEventHandler(async (event) => {
+  if (!isManagerUser(event.context.user)) {
+    return createError({
+      statusCode: 403,
+      statusMessage: "Only managers can edit trucks.",
+    });
+  }
+
   const vin = getRouterParam(event, "vin") as string;
   const result = await readValidatedBody(event, InsertTruck.safeParse);
 
@@ -27,5 +35,5 @@ export default defineAuthenticatedEventHandler(async (event) => {
     });
   }
 
-  return updateTruckByVin(result.data, vin, event.context.user.id);
+  return updateTruckByVin(result.data, vin);
 });

@@ -1,13 +1,16 @@
 import z from "zod";
 
 import { findTruckReportImageKeysByReportId } from "~/lib/db/queries/images";
-import { removeReportById } from "~/lib/db/queries/reports";
+import { findReport, removeReportById } from "~/lib/db/queries/reports";
 import env from "~/lib/env";
 import createS3Client from "~/utils/create-s3-client";
 import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-handler";
 import deleteS3Objects from "~/utils/delete-s3-objects";
+import { isManagerUser } from "~/utils/permissions";
 
 export default defineAuthenticatedEventHandler(async (event) => {
+  const isManager = isManagerUser(event.context.user);
+  const requestUserId = Number(event.context.user.id);
   const id = getRouterParam(event, "id") as string;
   const vin = getRouterParam(event, "vin") as string;
 
@@ -18,9 +21,24 @@ export default defineAuthenticatedEventHandler(async (event) => {
     });
   }
 
+  const report = await findReport(Number(id));
+  if (!report) {
+    return createError({
+      statusCode: 404,
+      statusMessage: "Report not found",
+    });
+  }
+
+  if (!isManager && report.userId !== requestUserId) {
+    return createError({
+      statusCode: 403,
+      statusMessage: "Only managers and report owners can delete reports.",
+    });
+  }
+
   await event.$fetch(`/api/trucks/${vin}/${id}`);
 
-  const imageKeys = await findTruckReportImageKeysByReportId(Number(id), event.context.user.id);
+  const imageKeys = await findTruckReportImageKeysByReportId(Number(id));
 
   if (imageKeys.length) {
     try {
@@ -35,7 +53,7 @@ export default defineAuthenticatedEventHandler(async (event) => {
     }
   }
 
-  const deleted = await removeReportById(Number(id), event.context.user.id);
+  const deleted = await removeReportById(Number(id));
 
   if (!deleted) {
     return createError({

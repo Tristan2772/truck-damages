@@ -1,9 +1,12 @@
-import { findReportByName, updateReportById } from "~/lib/db/queries/reports";
+import { findReport, findReportByName, updateReportById } from "~/lib/db/queries/reports";
 import { InsertTruckReport } from "~/lib/db/schema";
 import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-handler";
+import { isManagerUser } from "~/utils/permissions";
 import sendZodError from "~/utils/send-zod-error";
 
 export default defineAuthenticatedEventHandler(async (event) => {
+  const isManager = isManagerUser(event.context.user);
+  const requestUserId = Number(event.context.user.id);
   const reportId = Number(getRouterParam(event, "id"));
   const result = await readValidatedBody(event, InsertTruckReport.safeParse);
 
@@ -11,7 +14,22 @@ export default defineAuthenticatedEventHandler(async (event) => {
     return sendZodError(event, result.error);
   }
 
-  const existingReport = await findReportByName(result.data, event.context.user.id);
+  const report = await findReport(reportId);
+  if (!report) {
+    return createError({
+      statusCode: 404,
+      statusMessage: "Report not found",
+    });
+  }
+
+  if (!isManager && report.userId !== requestUserId) {
+    return createError({
+      statusCode: 403,
+      statusMessage: "Only managers and report owners can edit reports.",
+    });
+  }
+
+  const existingReport = await findReportByName(result.data, report.userId);
   if (existingReport && existingReport.id !== reportId) {
     return createError({
       statusCode: 409,
@@ -19,5 +37,5 @@ export default defineAuthenticatedEventHandler(async (event) => {
     });
   }
 
-  return updateReportById(result.data, reportId, event.context.user.id);
+  return updateReportById(result.data, reportId);
 });

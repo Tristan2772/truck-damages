@@ -3,6 +3,7 @@ import type { SelectTruckReportImage } from "../../lib/db/schema";
 
 const props = defineProps<{
   images: SelectTruckReportImage[];
+  enableLightbox?: boolean;
 }>();
 
 const config = useRuntimeConfig();
@@ -15,10 +16,15 @@ function hasSlotContent(image: SelectTruckReportImage): boolean {
 
 const visibleRef = ref(false);
 const indexRef = ref(0);
+const LIGHTBOX_Z_INDEX = 2147483647;
 
 const imgs = computed(() => props.images.map(image => `${config.public.s3BucketUrl}/${image.key}`));
 
 function showImg(index: number) {
+  if (props.enableLightbox === false) {
+    return;
+  }
+
   indexRef.value = index;
   visibleRef.value = true;
 }
@@ -36,7 +42,7 @@ const onHide = () => (visibleRef.value = false);
       <img
         class="size-full object-cover"
         :class="{
-          'cursor-pointer': !hasSlotContent(image),
+          'cursor-pointer': props.enableLightbox !== false && !hasSlotContent(image),
         }"
         :src="`${config.public.s3BucketUrl}/${image.key}`"
         loading="lazy"
@@ -50,10 +56,22 @@ const onHide = () => (visibleRef.value = false);
       </div>
     </div>
     <VueEasyLightbox
+      v-if="props.enableLightbox !== false"
       :visible="visibleRef"
       :imgs="imgs"
       :index="indexRef"
+      :z-index="LIGHTBOX_Z_INDEX"
       @hide="onHide"
     />
   </div>
 </template>
+
+<style scoped>
+:deep(.vel-modal),
+:deep(.vel-toolbar),
+:deep(.vel-btns-wrapper),
+:deep(.vel-img-title),
+:deep(.vel-img) {
+  z-index: 2147483647 !important;
+}
+</style>
