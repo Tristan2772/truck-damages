@@ -1,10 +1,14 @@
 <script lang="ts" setup>
 import type { FetchError } from "ofetch";
 
+import { isManagerEmail } from "~/utils/permissions";
+
 const truckStore = useTrucksStore();
+const authStore = useAuthStore();
 const { currentTruck: truck, currentTruckError: error, currentTruckStatus: status } = storeToRefs(truckStore);
 const route = useRoute();
 const isOpen = ref(false);
+const isManager = computed(() => isManagerEmail(authStore.user?.email));
 
 function openDialog() {
   isOpen.value = true;
@@ -71,7 +75,7 @@ onBeforeRouteUpdate((to) => {
           <div class="w-full flex flex-col gap-2 justify-center items-center pt-5">
             <h2 class="text-2xl flex items-center gap-2 text-balance">
               <span>{{ truck.name }}</span>
-              <div class="dropdown dropdown-bottom dropdown-end">
+              <div v-if="isManager" class="dropdown dropdown-bottom dropdown-end">
                 <div
                   tabindex="0"
                   role="button"

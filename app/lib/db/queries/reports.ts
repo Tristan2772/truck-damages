@@ -31,28 +31,59 @@ export async function findReport(reportId: number) {
 }
 
 export async function findReportByName(existing: InsertTruckReport, userId: number) {
+  const conditions = [
+    eq(truckReports.name, existing.name),
+  ];
+
+  if (userId) {
+    conditions.push(eq(truckReports.userId, userId));
+  }
+
   return db.query.truckReports.findFirst({
-    where: and(
-      eq(truckReports.name, existing.name),
-      eq(truckReports.userId, userId),
-    ),
+    where: and(...conditions),
   });
 }
 
-export async function updateReportById(updates: InsertTruckReport, reportId: number, userId: number) {
-  const [updated] = await db.update(truckReports).set(updates).where(and(
+export async function updateReportById(updates: InsertTruckReport, reportId: number, userId?: number) {
+  const conditions = [
     eq(truckReports.id, reportId),
-    eq(truckReports.userId, userId),
-  )).returning();
+  ];
+
+  if (userId) {
+    conditions.push(eq(truckReports.userId, userId));
+  }
+
+  const [updated] = await db.update(truckReports).set(updates).where(and(...conditions)).returning();
   return updated;
 }
 
-export async function removeReportById(reportId: number, userId: number) {
+export async function removeReportById(reportId: number, userId?: number) {
+  const conditions = [
+    eq(truckReports.id, reportId),
+  ];
+
+  if (userId) {
+    conditions.push(eq(truckReports.userId, userId));
+  }
+
   const [deleted] = await db.delete(truckReports).where(
-    and(
-      eq(truckReports.id, reportId),
-      eq(truckReports.userId, userId),
-    ),
+    and(...conditions),
   ).returning();
   return deleted;
+}
+
+export async function findReportsByUserId(userId: number) {
+  return db.query.truckReports.findMany({
+    where: eq(truckReports.userId, userId),
+    orderBy(fields, operators) {
+      return operators.desc(fields.createdAt);
+    },
+    with: {
+      images: {
+        orderBy(fields, operators) {
+          return operators.desc(fields.createdAt);
+        },
+      },
+    },
+  });
 }

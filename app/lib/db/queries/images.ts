@@ -19,41 +19,68 @@ export async function insertTruckReportImage(
   return inserted;
 }
 
-export async function deleteTruckReportImage(imageId: number, userId: number) {
+export async function deleteTruckReportImage(imageId: number, userId?: number) {
+  const conditions = [
+    eq(truckReportImages.id, imageId),
+  ];
+
+  if (userId) {
+    conditions.push(eq(truckReportImages.userId, userId));
+  }
+
   const [deleted] = await db.delete(truckReportImages).where(
-    and(
-      eq(truckReportImages.id, imageId),
-      eq(truckReportImages.userId, userId),
-    ),
+    and(...conditions),
   ).returning();
   return deleted;
 }
 
-export async function findTruckReportImageById(imageId: number, userId: number) {
+export async function findTruckReportImageById(imageId: number, userId?: number) {
+  const conditions = [
+    eq(truckReportImages.id, imageId),
+  ];
+
+  if (userId) {
+    conditions.push(eq(truckReportImages.userId, userId));
+  }
+
   return db.query.truckReportImages.findFirst({
-    where: and(
-      eq(truckReportImages.id, imageId),
-      eq(truckReportImages.userId, userId),
-    ),
+    where: and(...conditions),
   });
 }
 
-export async function findTruckReportImageKeysByReportId(reportId: number, userId: number) {
+export async function findTruckReportImageKeysByReportId(reportId: number, userId?: number) {
+  const conditions = [
+    eq(truckReports.id, reportId),
+  ];
+
+  if (userId) {
+    conditions.push(eq(truckReports.userId, userId));
+    conditions.push(eq(truckReportImages.userId, userId));
+  }
+
   const rows = await db.select({
     key: truckReportImages.key,
   }).from(truckReportImages).innerJoin(
     truckReports,
     eq(truckReportImages.truckReportId, truckReports.id),
   ).where(and(
-    eq(truckReports.id, reportId),
-    eq(truckReports.userId, userId),
-    eq(truckReportImages.userId, userId),
+    ...conditions,
   ));
 
   return rows.map(row => row.key);
 }
 
-export async function findTruckReportImageKeysByTruckVin(vin: string, userId: number) {
+export async function findTruckReportImageKeysByTruckVin(vin: string, userId?: number) {
+  const conditions = [
+    eq(trucks.vin, vin),
+  ];
+
+  if (userId) {
+    conditions.push(eq(trucks.userId, userId));
+    conditions.push(eq(truckReports.userId, userId));
+    conditions.push(eq(truckReportImages.userId, userId));
+  }
+
   const rows = await db.select({
     key: truckReportImages.key,
   }).from(truckReportImages).innerJoin(
@@ -63,10 +90,7 @@ export async function findTruckReportImageKeysByTruckVin(vin: string, userId: nu
     trucks,
     eq(truckReports.truckId, trucks.id),
   ).where(and(
-    eq(trucks.vin, vin),
-    eq(trucks.userId, userId),
-    eq(truckReports.userId, userId),
-    eq(truckReportImages.userId, userId),
+    ...conditions,
   ));
 
   return rows.map(row => row.key);

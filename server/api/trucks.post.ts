@@ -1,6 +1,7 @@
 import type { DrizzleError } from "drizzle-orm";
 
 import { InsertTruck } from "~/lib/db/schema";
+import { isManagerUser } from "~/utils/permissions";
 
 import { findTruckByName, findTruckByVin, insertTruck } from "../../app/lib/db/queries/trucks";
 import sendZodError from "../../app/utils/send-zod-error";
@@ -12,6 +13,14 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Unauthorized",
     }));
   }
+
+  if (!isManagerUser(event.context.user)) {
+    return createError({
+      statusCode: 403,
+      statusMessage: "Only managers can add trucks.",
+    });
+  }
+
   const result = await readValidatedBody(event, InsertTruck.safeParse);
 
   if (!result.success) {
