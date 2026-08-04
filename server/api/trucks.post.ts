@@ -1,6 +1,7 @@
 import type { DrizzleError } from "drizzle-orm";
 
 import { InsertTruck } from "~/lib/db/schema";
+import normalizeVin from "~/utils/normalize-vin";
 import { isManagerUser } from "~/utils/permissions";
 
 import { findTruckByName, findTruckByVin, insertTruck } from "../../app/lib/db/queries/trucks";
@@ -27,6 +28,8 @@ export default defineEventHandler(async (event) => {
     return sendZodError(event, result.error);
   }
 
+  const normalizedVin = normalizeVin(result.data.vin);
+
   const existingTruckName = await findTruckByName(result.data.name);
   if (existingTruckName) {
     return createError({
@@ -34,7 +37,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: "A truck with that name already exists",
     });
   }
-  const existingTruckVin = await findTruckByVin(result.data.vin);
+  const existingTruckVin = await findTruckByVin(normalizedVin);
   if (existingTruckVin) {
     return createError({
       statusCode: 409,
@@ -42,10 +45,14 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const vin = result.data.vin;
+  const vin = normalizedVin;
+  const truckToInsert = {
+    ...result.data,
+    vin: normalizedVin,
+  };
 
   try {
-    return insertTruck(result.data, vin, event.context.user.id);
+    return insertTruck(truckToInsert, vin, event.context.user.id);
   }
   catch (e) {
     const error = e as DrizzleError;

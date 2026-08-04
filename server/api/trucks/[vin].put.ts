@@ -1,6 +1,7 @@
 import { findTruckByName, findTruckByVin, updateTruckByVin } from "~/lib/db/queries/trucks";
 import { InsertTruck } from "~/lib/db/schema";
 import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-handler";
+import normalizeVin from "~/utils/normalize-vin";
 import { isManagerUser } from "~/utils/permissions";
 import sendZodError from "~/utils/send-zod-error";
 
@@ -19,7 +20,13 @@ export default defineAuthenticatedEventHandler(async (event) => {
     return sendZodError(event, result.error);
   }
 
-  const existingTruck = await findTruckByVin(result.data.vin);
+  const normalizedVin = normalizeVin(result.data.vin);
+  const updates = {
+    ...result.data,
+    vin: normalizedVin,
+  };
+
+  const existingTruck = await findTruckByVin(normalizedVin);
   if (existingTruck && existingTruck.vin !== vin) {
     return createError({
       statusCode: 409,
@@ -35,5 +42,5 @@ export default defineAuthenticatedEventHandler(async (event) => {
     });
   }
 
-  return updateTruckByVin(result.data, vin);
+  return updateTruckByVin(updates, vin);
 });

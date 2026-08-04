@@ -5,7 +5,8 @@
         Truck Damages
       </NuxtLink>
     </div>
-    <div class="flex-none flex">
+    <div class="flex-none flex items-center gap-2">
+      <AppNavbarSearch />
       <AppThemeToggle />
       <AppHamburgerMenu />
     </div>
