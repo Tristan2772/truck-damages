@@ -14,7 +14,7 @@ definePageMeta({
               Verify your email
             </h1>
             <p class="text-base-content/70">
-              Enter the one-time code sent to your email address.
+              Enter the one-time code sent to your email address. If you are unable to find the email, check your spam folder.
             </p>
           </div>
 

@@ -11,7 +11,7 @@ export const truckReportImages = sqliteTable("truckReportImages", {
   key: text().notNull(),
   description: text(),
   truckReportId: int().notNull().references(() => truckReports.id, { onDelete: "cascade" }),
-  userId: int().notNull().references(() => user.id, { onDelete: "cascade" }),
+  userId: int().notNull().references(() => user.id),
   createdAt: int().notNull().$default(() => Date.now()),
   updatedAt: int().notNull().$default(() => Date.now()).$onUpdate(() => Date.now()),
 });

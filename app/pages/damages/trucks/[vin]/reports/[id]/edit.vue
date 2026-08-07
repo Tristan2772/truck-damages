@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import type { InsertTruck } from "~/lib/db/schema";
+import type { InsertTruckReport } from "~/lib/db/schema";
 
 const trucksStore = useTrucksStore();
 const route = useRoute();
 
 const { $csrfFetch } = useNuxtApp() as any;
 
-async function onSubmit(values: InsertTruck) {
-  await $csrfFetch(`/api/trucks/${route.params.vin}`, {
+async function onSubmit(values: InsertTruckReport) {
+  await $csrfFetch(`/api/trucks/${route.params.vin}/${route.params.id}`, {
     method: "put",
     body: values,
   });
@@ -15,9 +15,10 @@ async function onSubmit(values: InsertTruck) {
 
 function onSubmitComplete() {
   navigateTo({
-    name: "dashboard-trucks-vin",
+    name: "damages-trucks-vin-reports-id",
     params: {
       vin: route.params.vin,
+      id: route.params.id,
     },
   });
 }
@@ -27,16 +28,16 @@ function onSubmitComplete() {
   <div class="container max-w-md mx-auto p-2">
     <div class="my-4">
       <h1 class="text-lg">
-        Edit Truck
+        Edit Report
       </h1>
     </div>
-    <AppTruckForm
-      v-if="trucksStore.currentTruckStatus !== 'pending'"
+    <AppTruckReportForm
+      v-if="trucksStore.currentReportStatus !== 'pending'"
       :on-submit
-      :initial-values="trucksStore.currentTruck"
+      :initial-values="trucksStore.currentReport"
       :on-submit-complete
       submit-label="Update"
-      submit-icon="JarUpdateIcon"
+      submit-icon="NoteUpdateIcon"
     />
   </div>
 </template>

@@ -38,7 +38,7 @@ export const useAuthStore = defineStore("useAuthStore", () => {
   async function signInWithGoogle() {
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: "/dashboard",
+      callbackURL: "/damages",
       errorCallbackURL: "/error",
       fetchOptions: {
         headers: createCsrfHeaders(),
@@ -53,7 +53,7 @@ export const useAuthStore = defineStore("useAuthStore", () => {
     const { error } = await authClient.signIn.email({
       email: normalizeEmail(credentials.email),
       password: credentials.password,
-      callbackURL: "/dashboard",
+      callbackURL: "/damages",
       fetchOptions: {
         headers: createCsrfHeaders(),
       },
@@ -72,7 +72,7 @@ export const useAuthStore = defineStore("useAuthStore", () => {
     }
 
     await init();
-    await navigateTo("/dashboard");
+    await navigateTo("/damages");
     return null;
   }
 

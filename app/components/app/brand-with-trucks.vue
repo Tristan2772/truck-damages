@@ -66,7 +66,7 @@ function getAllReportImages(truck: SelectTruckWithReportsAndImages) {
         <div class="flex justify-end items-center">
           <NuxtLink
             :to="{
-              name: 'dashboard-trucks-vin',
+              name: 'damages-trucks-vin',
               params: { vin: truck.vin },
             }"
             :aria-label="`link to ${truck.name}`"

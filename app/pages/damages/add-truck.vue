@@ -11,7 +11,7 @@ async function onSubmit(values: InsertTruck) {
 };
 
 function onSubmitComplete() {
-  navigateTo("/dashboard");
+  navigateTo("/damages");
 }
 </script>
 

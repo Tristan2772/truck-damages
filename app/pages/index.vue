@@ -18,7 +18,7 @@ const authStore = useAuthStore();
         <AppAuthButton v-else-if="!authStore.user" />
         <NuxtLink
           v-if="authStore.user"
-          to="/dashboard"
+          to="/damages"
           class="btn btn-secondary"
         >
           <Icon name="tabler:truck" size="24" />

@@ -13,7 +13,7 @@ export const trucks = sqliteTable("trucks", {
   vin: text().notNull(),
   name: text().notNull(),
   brand: text().notNull(),
-  userId: int().notNull().references(() => user.id, { onDelete: "cascade" }),
+  userId: int().notNull().references(() => user.id),
   createdAt: int().notNull().$default(() => Date.now()),
   updatedAt: int().notNull().$default(() => Date.now()).$onUpdate(() => Date.now()),
 }, t => [
