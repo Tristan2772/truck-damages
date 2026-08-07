@@ -24,7 +24,17 @@ export default defineNuxtConfig({
     "nuxt-csurf",
     "nuxt-easy-lightbox",
     "@sentry/nuxt/module",
+    "nuxt-nodemailer",
   ],
+
+  nodemailer: {
+    from: "'Mark Logistics' marklogisticsapps@gmail.com",
+    service: "Gmail",
+    auth: {
+      user: "marklogisticsapps@gmail.com",
+      pass: env.NUXT_NODEMAILER_AUTH_PASS,
+    },
+  },
 
   colorMode: {
     preference: "system",
