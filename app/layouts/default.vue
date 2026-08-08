@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 const route = useRoute();
 
-const showBreadcrumbs = computed(() => route.name !== "dashboard");
+const showBreadcrumbs = computed(() => route.name !== "damages");
 </script>
 
 <template>

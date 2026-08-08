@@ -22,7 +22,7 @@ function getCrumbTarget(segments: string[], index: number, runningPath: string) 
     const vin = segments[index + 1];
 
     if (vin) {
-      return `/dashboard/trucks/${vin}`;
+      return `/damages/trucks/${vin}`;
     }
   }
 
@@ -32,11 +32,11 @@ function getCrumbTarget(segments: string[], index: number, runningPath: string) 
     const reportId = isReportIdSegment(segments[index + 1]) ? segments[index + 1] : undefined;
 
     if (vin && reportId) {
-      return `/dashboard/trucks/${vin}/reports/${reportId}`;
+      return `/damages/trucks/${vin}/reports/${reportId}`;
     }
 
     if (vin) {
-      return `/dashboard/trucks/${vin}`;
+      return `/damages/trucks/${vin}`;
     }
   }
 

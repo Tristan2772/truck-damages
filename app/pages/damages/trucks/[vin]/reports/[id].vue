@@ -34,7 +34,7 @@ async function confirmDelete() {
     await $fetch(`/api/trucks/${route.params.vin}/${report.value?.id}`, {
       method: "DELETE",
     });
-    navigateTo({ name: "dashboard-trucks-vin", params: { vin: route.params.vin } });
+    navigateTo({ name: "damages-trucks-vin", params: { vin: route.params.vin } });
   }
   catch (e) {
     const error = e as FetchError;
@@ -50,7 +50,7 @@ onMounted(() => {
 });
 
 onBeforeRouteUpdate((to) => {
-  if (to.name === "dashboard-location-vin-id") {
+  if (to.name === "damages-location-vin-id") {
     truckStore.currentReportRefresh();
   }
 });
@@ -67,7 +67,7 @@ onBeforeRouteUpdate((to) => {
         <span>{{ errorMessage }}</span>
       </div>
     </div>
-    <div v-if="route.name === 'dashboard-trucks-vin-reports-id' && report && !loading">
+    <div v-if="route.name === 'damages-trucks-vin-reports-id' && report && !loading">
       <div class="flex flex-col">
         <div class="w-full flex flex-col gap-2 items-center text-center z-10">
           <div class="flex flex-col flex-1 gap-2 justify-center items-center pt-5">
@@ -93,7 +93,7 @@ onBeforeRouteUpdate((to) => {
                   <li>
                     <NuxtLink
                       :to="{
-                        name: 'dashboard-trucks-vin-reports-id-edit',
+                        name: 'damages-trucks-vin-reports-id-edit',
                         params: {
                           vin: route.params.vin,
                           id: report.id,
@@ -130,7 +130,7 @@ onBeforeRouteUpdate((to) => {
           </div>
           <div v-if="canManageReport">
             <div class="w-full card-body text-center flex flex-col items-center justify-center gap-4">
-              <NuxtLink :to="{ name: 'dashboard-trucks-vin-reports-id-images', params: { vin: route.params.vin, id: report.id } }" class="btn btn-secondary w-60">
+              <NuxtLink :to="{ name: 'damages-trucks-vin-reports-id-images', params: { vin: route.params.vin, id: report.id } }" class="btn btn-secondary w-60">
                 Add/Manage Images
                 <Icon name="tabler:plus" size="24" />
               </NuxtLink>
@@ -139,7 +139,7 @@ onBeforeRouteUpdate((to) => {
         </div>
       </div>
     </div>
-    <div v-if="route.name !== 'dashboard-trucks-vin-reports-id' && report && status !== 'pending'">
+    <div v-if="route.name !== 'damages-trucks-vin-reports-id' && report && status !== 'pending'">
       <NuxtPage />
     </div>
     <AppDialog

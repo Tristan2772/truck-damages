@@ -48,7 +48,7 @@ onBeforeMount(() => {
           <p class="text-xl max-h-fit">
             Add a truck to get started.
           </p>
-          <NuxtLink to="/dashboard/add-truck" class="btn btn-secondary w-40 flex items-center">
+          <NuxtLink to="/damages/add-truck" class="btn btn-secondary w-40 flex items-center">
             Add Truck
             <Icon name="tabler:plus" size="24" />
           </NuxtLink>

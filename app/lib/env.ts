@@ -16,6 +16,7 @@ const EnvSchema = z.object({
   S3_REGION: z.string(),
   S3_BUCKET: z.string(),
   S3_BUCKET_URL: z.string(),
+  NUXT_NODEMAILER_AUTH_PASS: z.string(),
 });
 
 export type EnvSchema = z.infer<typeof EnvSchema>;

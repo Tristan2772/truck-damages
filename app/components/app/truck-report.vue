@@ -20,7 +20,7 @@ const reportVin = computed(() => props.vin || route.params.vin?.toString());
     class="group card-body bg-base-100 text-left flex flex-col items-left p-2 pb-6 w-full transition-colors duration-200"
   >
     <NuxtLink
-      :to="{ name: 'dashboard-trucks-vin-reports-id', params: { vin: reportVin, id: props.reportId } }"
+      :to="{ name: 'damages-trucks-vin-reports-id', params: { vin: reportVin, id: props.reportId } }"
       class="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-base-300 focus-visible:bg-base-200 rounded"
       :aria-label="`link to ${props.name}`"
     >

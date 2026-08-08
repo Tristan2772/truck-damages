@@ -12,7 +12,7 @@ async function onSubmit(values: InsertTruckReport) {
 };
 
 function onSubmitComplete() {
-  navigateTo({ name: "dashboard-trucks-vin", params: { vin: route.params.vin } });
+  navigateTo({ name: "damages-trucks-vin", params: { vin: route.params.vin } });
 }
 </script>
 

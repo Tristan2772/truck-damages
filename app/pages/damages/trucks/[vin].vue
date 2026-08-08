@@ -28,7 +28,7 @@ async function confirmDelete() {
     await $fetch(`/api/trucks/${route.params.vin}`, {
       method: "DELETE",
     });
-    navigateTo("/dashboard");
+    navigateTo("/damages");
   }
   catch (e) {
     const error = e as FetchError;
@@ -44,11 +44,11 @@ onMounted(() => {
 });
 
 onBeforeRouteUpdate((to) => {
-  if (to.name === "dashboard-trucks-vin") {
+  if (to.name === "damages-trucks-vin") {
     setTimeout(() => {
       truckStore.currentTruckRefresh();
       navigateTo({
-        name: "dashboard-trucks-vin",
+        name: "damages-trucks-vin",
         params: {
           vin: route.params.vin,
         },
@@ -69,7 +69,7 @@ onBeforeRouteUpdate((to) => {
         <span>{{ errorMessage }}</span>
       </div>
     </div>
-    <div v-if="route.name === 'dashboard-trucks-vin' && truck && !loading">
+    <div v-if="route.name === 'damages-trucks-vin' && truck && !loading">
       <div class="flex flex-col">
         <div class="flex flex-col gap-2 items-center text-left">
           <div class="w-full flex flex-col gap-2 justify-center items-center pt-5">
@@ -87,7 +87,7 @@ onBeforeRouteUpdate((to) => {
                   <li>
                     <NuxtLink
                       :to="{
-                        name: 'dashboard-trucks-vin-edit',
+                        name: 'damages-trucks-vin-edit',
                         params: {
                           vin: route.params.vin,
                         },
@@ -133,7 +133,7 @@ onBeforeRouteUpdate((to) => {
               <p class="text-lg max-h-fit">
                 Add a new damage report. After creating the report, you can add images to the report to visually document the damage.
               </p>
-              <NuxtLink :to="{ name: 'dashboard-trucks-vin-reports-add', params: { vin: route.params.vin } }" class="btn btn-secondary w-40">
+              <NuxtLink :to="{ name: 'damages-trucks-vin-reports-add', params: { vin: route.params.vin } }" class="btn btn-secondary w-40">
                 Add Report
                 <Icon name="tabler:plus" size="24" />
               </NuxtLink>
@@ -142,7 +142,7 @@ onBeforeRouteUpdate((to) => {
         </div>
       </div>
     </div>
-    <div v-if="route.name !== 'dashboard-trucks-vin' && truck && status !== 'pending'">
+    <div v-if="route.name !== 'damages-trucks-vin' && truck && status !== 'pending'">
       <NuxtPage />
     </div>
     <AppDialog

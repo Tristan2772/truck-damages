@@ -61,7 +61,7 @@ const onSubmit = handleSubmit(async (values) => {
       name="name"
       type="text"
       :error="errors.name"
-      :disabled="loading || authStore.loading"
+      :disabled="loading || Boolean(authStore.loading)"
     />
 
     <AppFormField
@@ -69,7 +69,7 @@ const onSubmit = handleSubmit(async (values) => {
       name="email"
       type="text"
       :error="errors.email"
-      :disabled="loading || authStore.loading"
+      :disabled="loading || Boolean(authStore.loading)"
     />
 
     <AppFormField
@@ -77,7 +77,7 @@ const onSubmit = handleSubmit(async (values) => {
       name="password"
       type="password"
       :error="errors.password"
-      :disabled="loading || authStore.loading"
+      :disabled="loading || Boolean(authStore.loading)"
     />
 
     <button
