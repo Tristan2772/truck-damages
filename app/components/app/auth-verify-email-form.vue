@@ -5,13 +5,15 @@ import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import { z } from "zod";
 
+import { AUTH_EMAIL_DOMAIN_ERROR_MESSAGE } from "~/lib/constants";
+import { isAllowedAuthEmail } from "~/utils/auth-email";
 import getFetchErrorMessage from "~/utils/get-fetch-error-message";
 
 const authStore = useAuthStore();
 const route = useRoute();
 
 const verifySchema = z.object({
-  email: z.string().email("Enter a valid email address"),
+  email: z.string().email("Enter a valid email address").refine(isAllowedAuthEmail, AUTH_EMAIL_DOMAIN_ERROR_MESSAGE),
   otp: z.string().regex(/^\d{6}$/, "Enter the 6-digit code from your email"),
 });
 

@@ -5,13 +5,15 @@ import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import { z } from "zod";
 
+import { AUTH_EMAIL_DOMAIN_ERROR_MESSAGE } from "~/lib/constants";
+import { isAllowedAuthEmail } from "~/utils/auth-email";
 import getFetchErrorMessage from "~/utils/get-fetch-error-message";
 
 const authStore = useAuthStore();
 
 const signUpSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters long"),
-  email: z.string().email("Enter a valid email address"),
+  email: z.string().email("Enter a valid email address").refine(isAllowedAuthEmail, AUTH_EMAIL_DOMAIN_ERROR_MESSAGE),
   password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 

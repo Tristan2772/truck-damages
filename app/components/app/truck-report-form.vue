@@ -4,7 +4,7 @@ import { InsertTruckReport } from "~/lib/db/schema";
 const props = defineProps<{
   initialValues?: InsertTruckReport;
   submitLabel: string;
-  submitIcon: "NoteUpdateIcon" | "tabler:plus";
+  submitIcon: "ReportUpdateIcon" | "tabler:plus";
   onSubmit: (report: InsertTruckReport) => Promise<any>;
   onSubmitComplete: () => void;
 }>();

@@ -1,6 +1,19 @@
 <script lang="ts" setup>
 import type { InsertTruck } from "~/lib/db/schema";
 
+import { isManagerUser } from "~/utils/permissions";
+
+definePageMeta({
+  middleware: [
+    () => {
+      const authStore = useAuthStore();
+      if (!isManagerUser(authStore.user)) {
+        return navigateTo("/damages");
+      }
+    },
+  ],
+});
+
 const { $csrfFetch } = useNuxtApp() as any;
 
 async function onSubmit(values: InsertTruck) {

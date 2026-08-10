@@ -21,6 +21,7 @@ export async function findReport(reportId: number) {
       eq(truckReports.id, reportId),
     ),
     with: {
+      user: true,
       images: {
         orderBy(fields, operators) {
           return operators.desc(fields.createdAt);
@@ -79,6 +80,7 @@ export async function findReportsByUserId(userId: number) {
       return operators.desc(fields.createdAt);
     },
     with: {
+      user: true,
       images: {
         orderBy(fields, operators) {
           return operators.desc(fields.createdAt);

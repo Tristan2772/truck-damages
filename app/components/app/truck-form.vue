@@ -30,12 +30,14 @@ const props = defineProps<{
       name="vin"
       :error="errors.vin"
       :disabled="loading"
+      uppercase
     />
     <AppFormField
       label="Name"
       name="name"
       :error="errors.name"
       :disabled="loading"
+      uppercase
     />
     <AppSelectFormField
       label="Brand"

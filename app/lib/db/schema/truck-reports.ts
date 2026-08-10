@@ -3,6 +3,7 @@ import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import z from "zod";
 
+import type { SelectUser } from "./auth";
 import type { SelectTruckReportImage } from "./truck-report-images";
 
 import { user } from "./auth";
@@ -33,6 +34,10 @@ export const InsertTruckReport = createInsertSchema(truckReports, {
 });
 
 export const TruckReportsRelations = relations(truckReports, ({ one, many }) => ({
+  user: one(user, {
+    fields: [truckReports.userId],
+    references: [user.id],
+  }),
   truck: one(trucks, {
     fields: [truckReports.truckId],
     references: [trucks.id],
@@ -44,4 +49,5 @@ export type SelectTruckReport = typeof truckReports.$inferSelect;
 export type InsertTruckReport = z.infer<typeof InsertTruckReport>;
 export type SelectTruckReportWithImages = SelectTruckReport & {
   images: SelectTruckReportImage[];
+  user: SelectUser;
 };

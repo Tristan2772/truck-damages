@@ -100,7 +100,7 @@ onBeforeRouteUpdate((to) => {
                         },
                       }"
                     >
-                      <AppJarSettingsIcon />
+                      <!-- <AppJarSettingsIcon /> -->
                       Edit
                     </NuxtLink>
                   </li>

@@ -124,6 +124,7 @@ onBeforeRouteUpdate((to) => {
               :description="report.description"
               :started-at="report.createdAt"
               :images="report.images"
+              :reported-by-name="report.user.name"
               class="zig-zag transition-all duration-300"
             />
           </div>
@@ -133,8 +134,8 @@ onBeforeRouteUpdate((to) => {
               <p class="text-lg max-h-fit">
                 Add a new damage report. After creating the report, you can add images to the report to visually document the damage.
               </p>
-              <NuxtLink :to="{ name: 'damages-trucks-vin-reports-add', params: { vin: route.params.vin } }" class="btn btn-secondary w-40">
-                Add Report
+              <NuxtLink :to="{ name: 'damages-trucks-vin-reports-add', params: { vin: route.params.vin } }" class="btn btn-secondary w-40 flex align-center">
+                New Report
                 <Icon name="tabler:plus" size="24" />
               </NuxtLink>
             </div>

@@ -1,4 +1,6 @@
 import { authClient } from "~/lib/auth-client";
+import { AUTH_EMAIL_DOMAIN_ERROR_MESSAGE } from "~/lib/constants";
+import { isAllowedAuthEmail, normalizeEmail } from "~/utils/auth-email";
 
 const EMAIL_VERIFICATION_RESEND_COOLDOWN_MS = 60_000;
 
@@ -20,10 +22,6 @@ export const useAuthStore = defineStore("useAuthStore", () => {
     return error.message || error.statusMessage || "An unknown error occurred.";
   }
 
-  function normalizeEmail(email: string) {
-    return email.trim().toLowerCase();
-  }
-
   function setPendingVerificationEmail(email: string | null) {
     pendingVerificationEmail.value = email ? normalizeEmail(email) : null;
   }
@@ -35,25 +33,17 @@ export const useAuthStore = defineStore("useAuthStore", () => {
     return headers;
   }
 
-  async function signInWithGoogle() {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/damages",
-      errorCallbackURL: "/error",
-      fetchOptions: {
-        headers: createCsrfHeaders(),
-      },
-    });
-    await init();
-  }
-
   async function signInWithEmail(credentials: { email: string; password: string }) {
     lastSignInNeedsVerification.value = false;
+
+    if (!isAllowedAuthEmail(credentials.email)) {
+      return AUTH_EMAIL_DOMAIN_ERROR_MESSAGE;
+    }
 
     const { error } = await authClient.signIn.email({
       email: normalizeEmail(credentials.email),
       password: credentials.password,
-      callbackURL: "/damages",
+      callbackURL: "/",
       fetchOptions: {
         headers: createCsrfHeaders(),
       },
@@ -72,12 +62,16 @@ export const useAuthStore = defineStore("useAuthStore", () => {
     }
 
     await init();
-    await navigateTo("/damages");
+    await navigateTo("/");
     return null;
   }
 
   async function signUpWithEmail(credentials: { name: string; email: string; password: string }) {
     const normalizedEmail = normalizeEmail(credentials.email);
+
+    if (!isAllowedAuthEmail(normalizedEmail)) {
+      return AUTH_EMAIL_DOMAIN_ERROR_MESSAGE;
+    }
 
     const { error } = await authClient.signUp.email({
       name: credentials.name,
@@ -106,6 +100,10 @@ export const useAuthStore = defineStore("useAuthStore", () => {
 
     if (!targetEmail) {
       return "Enter an email address to receive a verification code.";
+    }
+
+    if (!isAllowedAuthEmail(targetEmail)) {
+      return AUTH_EMAIL_DOMAIN_ERROR_MESSAGE;
     }
 
     const now = Date.now();
@@ -137,6 +135,10 @@ export const useAuthStore = defineStore("useAuthStore", () => {
 
     if (!targetEmail) {
       return "Enter the email address to verify.";
+    }
+
+    if (!isAllowedAuthEmail(targetEmail)) {
+      return AUTH_EMAIL_DOMAIN_ERROR_MESSAGE;
     }
 
     const { error } = await authClient.emailOtp.verifyEmail({
@@ -174,8 +176,6 @@ export const useAuthStore = defineStore("useAuthStore", () => {
     emailVerificationResendAvailableAt,
     lastSignInNeedsVerification,
     setPendingVerificationEmail,
-    signIn: signInWithGoogle,
-    signInWithGoogle,
     signInWithEmail,
     signUpWithEmail,
     sendEmailVerificationOtp,
