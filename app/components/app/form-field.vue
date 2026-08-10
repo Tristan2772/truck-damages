@@ -7,6 +7,7 @@ const props = defineProps<{
   type?: "text" | "password" | "textarea";
   error?: string;
   disabled: boolean;
+  uppercase?: boolean;
 }>();
 </script>
 
@@ -16,17 +17,23 @@ const props = defineProps<{
       {{ (props.label) }}
     </legend>
     <Field
-      :disabled="disabled"
-      :as="type === 'textarea' ? 'textarea' : 'input'"
+      v-slot="{ field, handleChange }"
       :name="name"
-      :type="type && type !== 'textarea' ? type : 'text'"
-      class="w-full"
-      :class="{
-        'input-error': props.error,
-        'input': !type || type === 'text' || type === 'password',
-        'textarea': type === 'textarea',
-      }"
-    />
+    >
+      <component
+        :is="type === 'textarea' ? 'textarea' : 'input'"
+        v-bind="field"
+        :disabled="disabled"
+        :type="type && type !== 'textarea' ? type : 'text'"
+        class="w-full"
+        :class="{
+          'input-error': props.error,
+          'input': !type || type === 'text' || type === 'password',
+          'textarea': type === 'textarea',
+        }"
+        @input="handleChange(uppercase ? ($event.target as HTMLInputElement).value.toUpperCase() : $event)"
+      />
+    </Field>
     <p v-if="props.error" class="fieldset-label text-error">
       {{ props.error }}
     </p>

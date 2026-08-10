@@ -3,6 +3,7 @@ import { isManagerEmail } from "~/utils/permissions";
 
 const isOpen = ref(false);
 const authStore = useAuthStore();
+const route = useRoute();
 
 const isManager = computed(() => isManagerEmail(authStore.user?.email));
 
@@ -23,6 +24,8 @@ function closeIfClickedOutside(event: PointerEvent) {
 function closeMenu() {
   isOpen.value = false;
 }
+
+watch(() => route.fullPath, closeMenu);
 
 onMounted(() => {
   isOpen.value = false;

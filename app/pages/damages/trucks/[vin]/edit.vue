@@ -36,7 +36,8 @@ function onSubmitComplete() {
       :initial-values="trucksStore.currentTruck"
       :on-submit-complete
       submit-label="Update"
-      submit-icon="JarUpdateIcon"
+      submit-icon="tabler:plus"
     />
+    <!-- Jarupdateicon ^^^^  -->
   </div>
 </template>

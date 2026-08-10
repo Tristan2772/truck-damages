@@ -30,10 +30,10 @@ const activeTab = ref<"sign-in" | "sign-up">("sign-in");
     <div class="card-body gap-6">
       <div class="space-y-2">
         <h2 class="card-title text-3xl">
-          Access your truck damage reports
+          Access Apps
         </h2>
         <p class="text-base-content/70">
-          Sign in with your email and password, or create a new account to start tracking damage reports.
+          Sign in with your email and password, or create a new account.
         </p>
       </div>
 
@@ -58,25 +58,6 @@ const activeTab = ref<"sign-in" | "sign-up">("sign-in");
 
       <AppAuthSignInForm v-if="activeTab === 'sign-in'" />
       <AppAuthSignUpForm v-else />
-
-      <div class="divider text-xs uppercase tracking-[0.3em] text-base-content/50">
-        Or continue with
-      </div>
-
-      <button
-        :disabled="authStore.loading"
-        class="btn btn-outline w-full"
-        type="button"
-        @click="authStore.signIn"
-      >
-        <span v-if="authStore.loading" class="loading loading-spinner loading-sm" />
-        <Icon
-          v-else
-          name="tabler:brand-google"
-          size="20"
-        />
-        Google
-      </button>
     </div>
   </div>
 </template>

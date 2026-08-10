@@ -48,6 +48,7 @@ onBeforeMount(() => {
           :description="report.description"
           :started-at="report.createdAt"
           :images="report.images"
+          :reported-by-name="report.user.name"
           class="zig-zag transition-all duration-300"
         />
       </div>

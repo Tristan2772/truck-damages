@@ -15,6 +15,7 @@ export async function findTruck(vin: string) {
           return operators.desc(fields.createdAt);
         },
         with: {
+          user: true,
           images: {
             orderBy(fields, operators) {
               return operators.desc(fields.createdAt);
@@ -34,6 +35,7 @@ export async function findAllTrucks() {
           return operators.desc(fields.createdAt);
         },
         with: {
+          user: true,
           images: {
             orderBy(fields, operators) {
               return operators.desc(fields.createdAt);
