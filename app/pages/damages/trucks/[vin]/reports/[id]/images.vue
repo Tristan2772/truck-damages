@@ -53,10 +53,6 @@ async function getChecksum(blob: Blob) {
 }
 
 async function prepareImageForUpload(file: File): Promise<File> {
-  if (file.type === "image/heic" || file.type === "image/heif") {
-    return file;
-  }
-
   const objectUrl = URL.createObjectURL(file);
 
   try {
@@ -67,19 +63,21 @@ async function prepareImageForUpload(file: File): Promise<File> {
       image.src = objectUrl;
     });
 
+    const naturalWidth = imageElement.naturalWidth || imageElement.width;
+    const naturalHeight = imageElement.naturalHeight || imageElement.height;
     const maxDimension = 1000;
-    const width = Math.min(maxDimension, imageElement.naturalWidth || imageElement.width);
-    const height = Math.min(maxDimension, imageElement.naturalHeight || imageElement.height);
 
-    if (width >= (imageElement.naturalWidth || imageElement.width) && height >= (imageElement.naturalHeight || imageElement.height)) {
+    if (naturalWidth <= maxDimension && naturalHeight <= maxDimension) {
       return file;
     }
 
     const canvas = document.createElement("canvas");
+    const width = Math.min(maxDimension, naturalWidth);
+    const height = Math.min(maxDimension, naturalHeight);
     canvas.width = width;
     canvas.height = height;
-    const context = canvas.getContext("2d");
 
+    const context = canvas.getContext("2d");
     if (!context) {
       return file;
     }
@@ -97,6 +95,9 @@ async function prepareImageForUpload(file: File): Promise<File> {
     return new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), {
       type: "image/jpeg",
     });
+  }
+  catch {
+    return file;
   }
   finally {
     URL.revokeObjectURL(objectUrl);

@@ -8,7 +8,7 @@ import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-
 import { isManagerUser } from "~/utils/permissions";
 import sendZodError from "~/utils/send-zod-error";
 
-const MAX_CONTENT_LENGTH = 1024 * 1024 * 0.5;
+const MAX_CONTENT_LENGTH = 1024 * 1024 * 10;
 
 const ImageSchema = z.object({
   contentLength: z.number().min(1).max(MAX_CONTENT_LENGTH),
