@@ -52,6 +52,57 @@ async function getChecksum(blob: Blob) {
   return btoa(String.fromCharCode(...new Uint8Array(hashBuffer)));
 }
 
+async function prepareImageForUpload(file: File): Promise<File> {
+  if (file.type === "image/heic" || file.type === "image/heif") {
+    return file;
+  }
+
+  const objectUrl = URL.createObjectURL(file);
+
+  try {
+    const imageElement = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error("Unable to read image file."));
+      image.src = objectUrl;
+    });
+
+    const maxDimension = 1000;
+    const width = Math.min(maxDimension, imageElement.naturalWidth || imageElement.width);
+    const height = Math.min(maxDimension, imageElement.naturalHeight || imageElement.height);
+
+    if (width >= (imageElement.naturalWidth || imageElement.width) && height >= (imageElement.naturalHeight || imageElement.height)) {
+      return file;
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      return file;
+    }
+
+    context.drawImage(imageElement, 0, 0, width, height);
+
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, "image/jpeg", 0.9);
+    });
+
+    if (!blob) {
+      return file;
+    }
+
+    return new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), {
+      type: "image/jpeg",
+    });
+  }
+  finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
 async function uploadImage() {
   if (!image.value || !previewUrl.value) {
     return;
@@ -59,74 +110,61 @@ async function uploadImage() {
 
   errorMessage.value = "";
   loading.value = true;
-  const previewImage = new Image();
-  previewImage.addEventListener("load", async () => {
-    try {
-      const width = Math.min(1000, previewImage.width);
-      const resized = await createImageBitmap(previewImage, {
-        resizeWidth: width,
-      });
-      const canvas = new OffscreenCanvas(width, resized.height);
-      canvas.getContext("bitmaprenderer")?.transferFromImageBitmap(resized);
-      const blob = await canvas.convertToBlob({
-        type: "image/jpeg",
-        quality: 0.9,
-      });
 
-      const checksum = await getChecksum(blob);
+  try {
+    const uploadFile = await prepareImageForUpload(image.value);
+    const checksum = await getChecksum(uploadFile);
 
-      const { fields, key, url } = await $csrfFetch(`/api/trucks/${route.params.vin}/${route.params.id}/sign-image`, {
-        method: "POST",
-        body: {
-          contentLength: blob.size,
-          checksum,
-        },
-      });
+    const { fields, key, url } = await $csrfFetch(`/api/trucks/${route.params.vin}/${route.params.id}/sign-image`, {
+      method: "POST",
+      body: {
+        contentLength: uploadFile.size,
+        checksum,
+      },
+    });
 
-      const formData = new FormData();
-      Object.entries(fields).forEach(([key, value]) => {
-        formData.append(key, value as string);
-      });
-      formData.append("file", blob);
+    const formData = new FormData();
+    Object.entries(fields).forEach(([key, value]) => {
+      formData.append(key, value as string);
+    });
+    formData.append("file", uploadFile);
 
-      await $fetch(url, {
-        method: "POST",
-        body: formData,
-      });
+    await $fetch(url, {
+      method: "POST",
+      body: formData,
+    });
 
-      await $csrfFetch(`/api/trucks/${route.params.vin}/${route.params.id}/image`, {
-        method: "POST",
-        body: {
-          key,
-        },
-      });
+    await $csrfFetch(`/api/trucks/${route.params.vin}/${route.params.id}/image`, {
+      method: "POST",
+      body: {
+        key,
+      },
+    });
 
-      await truckStore.currentReportRefresh();
-      image.value = null;
-      if (previewUrl.value) {
-        URL.revokeObjectURL(previewUrl.value);
-      }
-      previewUrl.value = null;
-      if (inputRef.value) {
-        inputRef.value.value = "";
-      }
+    await truckStore.currentReportRefresh();
+    image.value = null;
+    if (previewUrl.value) {
+      URL.revokeObjectURL(previewUrl.value);
     }
-    catch (e) {
-      if (e instanceof FetchError) {
-        errorMessage.value = (e as FetchError).statusMessage || "Unknown Error";
-      }
-      else if (e instanceof Error) {
-        errorMessage.value = (e as Error).message;
-      }
-      else {
-        errorMessage.value = "Unknown Error";
-      }
+    previewUrl.value = null;
+    if (inputRef.value) {
+      inputRef.value.value = "";
     }
-    finally {
-      loading.value = false;
+  }
+  catch (e) {
+    if (e instanceof FetchError) {
+      errorMessage.value = (e as FetchError).statusMessage || "Unknown Error";
     }
-  });
-  previewImage.src = previewUrl.value;
+    else if (e instanceof Error) {
+      errorMessage.value = (e as Error).message;
+    }
+    else {
+      errorMessage.value = "Unknown Error";
+    }
+  }
+  finally {
+    loading.value = false;
+  }
 }
 
 const isOpen = ref(false);
@@ -191,6 +229,8 @@ async function confirmDelete() {
       <input
         ref="imageInput"
         type="file"
+        accept="image/*"
+        capture="environment"
         class="file-input"
         :disabled="loading"
         @change="selectImage"
