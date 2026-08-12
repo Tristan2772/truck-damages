@@ -12,7 +12,7 @@ const MAX_CONTENT_LENGTH = 1024 * 1024 * 10;
 
 const ImageSchema = z.object({
   contentLength: z.number().min(1).max(MAX_CONTENT_LENGTH),
-  checksum: z.string(),
+  checksum: z.string().optional(),
 });
 
 export default defineAuthenticatedEventHandler(async (event) => {
@@ -57,13 +57,15 @@ export default defineAuthenticatedEventHandler(async (event) => {
   const fileName = crypto.randomUUID();
   const key = `${requestUserId}/${id}/${fileName}.jpg`;
 
+  const checksumFields: Record<string, string> = result.data.checksum
+    ? { "x-amz-checksum-sha256": result.data.checksum }
+    : {};
+
   const { url, fields } = await createPresignedPost(client, {
     Bucket: env.S3_BUCKET,
     Key: key,
     Expires: 120,
-    Fields: {
-      "x-amz-checksum-sha256": result.data.checksum,
-    },
+    Fields: checksumFields,
     Conditions: [
       ["content-length-range", result.data.contentLength, result.data.contentLength],
       ["eq", "$x-amz-meta-user-id", requestUserId.toString()],

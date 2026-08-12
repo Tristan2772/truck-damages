@@ -11,6 +11,7 @@ Required auth + mail variables include:
 ```bash
 BETTER_AUTH_SECRET=
 BETTER_AUTH_URL=
+BETTER_AUTH_TRUSTED_ORIGINS=
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 NUXT_NODEMAILER_AUTH_PASS=
@@ -41,6 +42,19 @@ Start the development server on `http://localhost:3000`:
 ```bash
 # npm
 npm run dev
+```
+
+To test sign-in from another device on your LAN (for example, iPhone), run:
+
+```bash
+# npm
+npm run dev -- --host 0.0.0.0
+```
+
+For Better Auth origin validation in development, include both localhost and LAN origins in `BETTER_AUTH_TRUSTED_ORIGINS` (comma-separated), for example:
+
+```bash
+BETTER_AUTH_TRUSTED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://192.168.0.90:3000
 ```
 
 ## Production

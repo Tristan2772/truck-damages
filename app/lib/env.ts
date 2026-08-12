@@ -8,6 +8,7 @@ const EnvSchema = z.object({
   TURSO_AUTH_TOKEN: z.string(),
   BETTER_AUTH_SECRET: z.string(),
   BETTER_AUTH_URL: z.string(),
+  BETTER_AUTH_TRUSTED_ORIGINS: z.string().optional(),
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
   S3_ENDPOINT: z.string(),

@@ -13,6 +13,22 @@ export type userWithId = Omit<User, "id"> & {
   id: number;
 };
 
+function parseTrustedOrigins(rawValue?: string) {
+  if (!rawValue) {
+    return [];
+  }
+
+  return rawValue
+    .split(",")
+    .map(origin => origin.trim())
+    .filter(origin => origin.length > 0);
+}
+
+const trustedOrigins = Array.from(new Set([
+  env.BETTER_AUTH_URL,
+  ...parseTrustedOrigins(env.BETTER_AUTH_TRUSTED_ORIGINS),
+]));
+
 export const auth = betterAuth({
   hooks: {
     after: createAuthMiddleware(async (ctx) => {
@@ -36,6 +52,7 @@ export const auth = betterAuth({
     },
   },
   baseURL: env.BETTER_AUTH_URL,
+  trustedOrigins,
   emailAndPassword: {
     enabled: true,
     autoSignIn: false,
