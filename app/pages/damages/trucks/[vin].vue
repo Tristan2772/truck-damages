@@ -8,9 +8,19 @@ const authStore = useAuthStore();
 const { currentTruck: truck, currentTruckError: error, currentTruckStatus: status } = storeToRefs(truckStore);
 const route = useRoute();
 const isOpen = ref(false);
+const isActionsMenuOpen = ref(false);
 const isManager = computed(() => isManagerEmail(authStore.user?.email));
 
+function closeActionsMenu() {
+  isActionsMenuOpen.value = false;
+}
+
+function closeActionsMenuOnBlur() {
+  window.setTimeout(closeActionsMenu, 0);
+}
+
 function openDialog() {
+  closeActionsMenu();
   isOpen.value = true;
   (document.activeElement as HTMLAnchorElement).blur();
 }
@@ -75,14 +85,20 @@ onBeforeRouteUpdate((to) => {
           <div class="w-full flex flex-col gap-2 justify-center items-center pt-5">
             <h2 class="text-2xl flex items-center gap-2 text-balance">
               <span>{{ truck.name }}</span>
-              <div v-if="isManager" class="dropdown dropdown-bottom dropdown-end">
-                <div
+              <div
+                v-if="isManager"
+                class="dropdown dropdown-bottom dropdown-end"
+                :class="{ 'dropdown-open': isActionsMenuOpen }"
+              >
+                <button
                   tabindex="0"
-                  role="button"
                   class="btn btn-sm btn-ghost hover:bg-base-100 p-2"
+                  type="button"
+                  @blur="closeActionsMenuOnBlur"
+                  @click="isActionsMenuOpen = !isActionsMenuOpen"
                 >
                   <Icon name="tabler:dots-vertical" size="18" />
-                </div>
+                </button>
                 <ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm mb-2  border-2 border-secondary">
                   <li>
                     <NuxtLink
@@ -92,6 +108,7 @@ onBeforeRouteUpdate((to) => {
                           vin: route.params.vin,
                         },
                       }"
+                      @click="closeActionsMenu"
                     >
                       <AppTruckSettingsIcon />
                       Edit

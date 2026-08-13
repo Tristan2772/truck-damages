@@ -8,6 +8,7 @@ const truckStore = useTrucksStore();
 const authStore = useAuthStore();
 const { currentReport: report, currentReportError: error, currentReportStatus: status } = storeToRefs(truckStore);
 const isOpen = ref(false);
+const isActionsMenuOpen = ref(false);
 const isDeleting = ref(false);
 const deleteError = ref("");
 const loading = computed(() => status.value === "pending" || isDeleting.value);
@@ -21,7 +22,16 @@ const canManageReport = computed(() => {
   return isManager.value || Number(authStore.user.id) === report.value.userId;
 });
 
+function closeActionsMenu() {
+  isActionsMenuOpen.value = false;
+}
+
+function closeActionsMenuOnBlur() {
+  window.setTimeout(closeActionsMenu, 0);
+}
+
 function openDialog() {
+  closeActionsMenu();
   isOpen.value = true;
   (document.activeElement as HTMLAnchorElement).blur();
 }
@@ -50,7 +60,7 @@ onMounted(() => {
 });
 
 onBeforeRouteUpdate((to) => {
-  if (to.name === "damages-location-vin-id") {
+  if (to.name === "damages-trucks-vin-reports-id") {
     truckStore.currentReportRefresh();
   }
 });
@@ -81,14 +91,20 @@ onBeforeRouteUpdate((to) => {
             </div>
             <h2 class="w-full text-xl flex items-center gap-2 text-center">
               <span class="w-full">{{ report.name }}</span>
-              <div v-if="canManageReport" class="dropdown dropdown-bottom dropdown-end">
-                <div
+              <div
+                v-if="canManageReport"
+                class="dropdown dropdown-bottom dropdown-end"
+                :class="{ 'dropdown-open': isActionsMenuOpen }"
+              >
+                <button
                   tabindex="0"
-                  role="button"
                   class="btn btn-sm btn-ghost hover:bg-base-100 p-2"
+                  type="button"
+                  @blur="closeActionsMenuOnBlur"
+                  @click="isActionsMenuOpen = !isActionsMenuOpen"
                 >
                   <Icon name="tabler:dots-vertical" size="18" />
-                </div>
+                </button>
                 <ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm mb-2 border-2 border-secondary">
                   <li>
                     <NuxtLink
@@ -99,6 +115,7 @@ onBeforeRouteUpdate((to) => {
                           id: report.id,
                         },
                       }"
+                      @click="closeActionsMenu"
                     >
                       <!-- <AppJarSettingsIcon /> -->
                       Edit

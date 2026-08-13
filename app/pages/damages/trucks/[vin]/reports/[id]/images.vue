@@ -210,7 +210,7 @@ async function confirmDelete() {
 <template>
   <div class="flex flex-col gap-2 p-2 items-start">
     <h2 class="text-lg text-center">
-      Manage "{{ formatDateYearLast(Number(report?.createdAt)) }}" Images
+      Manage "{{ report?.name }}" Images
     </h2>
     <div v-if="canUploadImages" class="flex flex-col gap-2 w-72 relative">
       <div class="bg-gray-500 h-30 w-full flex justify-center items-center p-2">
