@@ -95,7 +95,7 @@ onBeforeUnmount(() => {
         v-model="searchTerm"
         type="text"
         class="grow placeholder:text-gray-300/75"
-        placeholder="Search for truck or report"
+        placeholder="Search..."
         @focus="isSearchOpen = true"
         @blur="closeSearch"
       >

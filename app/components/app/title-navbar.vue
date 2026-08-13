@@ -6,7 +6,7 @@ const showDamagesNavigation = computed(() => route.path.startsWith("/damages"));
 
 <template>
   <div class="navbar bg-red-600 shadow-sm text-gray-200 relative z-100">
-    <div class="navbar-start flex-1">
+    <div class="navbar-start flex-1 mr-2">
       <NuxtLink class="btn btn-ghost text-xl" to="/">
         MAKL Apps
       </NuxtLink>

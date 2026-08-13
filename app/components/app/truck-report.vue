@@ -46,9 +46,9 @@ const isManager = computed(() => isManagerEmail(authStore.user?.email));
       no images
     </p>
     <div class="flex justify-between items-center">
-      <p class="text-sm text-gray-500">
+      <p v-if="isManager && props.reportedByName" class="text-sm text-gray-500">
         <span>Reported by: </span>
-        <span v-if="isManager && props.reportedByName"> {{ props.reportedByName }}</span>
+        <span> {{ props.reportedByName }}</span>
       </p>
       <NuxtLink
         :to="{ name: 'damages-trucks-vin-reports-id', params: { vin: reportVin, id: props.reportId } }"

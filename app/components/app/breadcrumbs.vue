@@ -65,7 +65,7 @@ const crumbs = computed(() => {
 </script>
 
 <template>
-  <nav class="bg-base-200 px-4 py-2 border-b border-base-content/10" aria-label="Breadcrumb">
+  <nav class="bg-base-200 px-4 py-2 border-b border-base-content/10 overflow-x-auto" aria-label="Breadcrumb">
     <div class="container mx-auto text-sm">
       <div class="breadcrumbs">
         <ul>
