@@ -57,6 +57,25 @@ export const auth = betterAuth({
     enabled: true,
     autoSignIn: false,
     requireEmailVerification: true,
+    revokeSessionsOnPasswordReset: true,
+    async sendResetPassword({ user, url }) {
+      const { sendMail } = useNodeMailer();
+
+      void sendMail({
+        to: user.email,
+        subject: "Reset your password",
+        text: [
+          "A password reset was requested for your account.",
+          "",
+          `Reset your password: ${url}`,
+          "",
+          "If you did not request this, you can ignore this email.",
+        ].join("\n"),
+        html: `<p>A password reset was requested for your account.</p><p><a href="${url}">Reset your password</a></p><p>If you did not request this, you can ignore this email.</p>`,
+      }).catch((error: unknown) => {
+        console.error("Failed to send password reset email", error);
+      });
+    },
   },
   plugins: [
     emailOTP({

@@ -158,6 +158,36 @@ export const useAuthStore = defineStore("useAuthStore", () => {
     return null;
   }
 
+  async function requestPasswordReset(email: string, redirectTo: string) {
+    const normalizedEmail = normalizeEmail(email);
+
+    if (!isAllowedAuthEmail(normalizedEmail)) {
+      return AUTH_EMAIL_DOMAIN_ERROR_MESSAGE;
+    }
+
+    const { error } = await authClient.requestPasswordReset({
+      email: normalizedEmail,
+      redirectTo,
+      fetchOptions: {
+        headers: createCsrfHeaders(),
+      },
+    });
+
+    return error ? getErrorMessage(error) : null;
+  }
+
+  async function resetPassword(newPassword: string, token: string) {
+    const { error } = await authClient.resetPassword({
+      newPassword,
+      token,
+      fetchOptions: {
+        headers: createCsrfHeaders(),
+      },
+    });
+
+    return error ? getErrorMessage(error) : null;
+  }
+
   async function signOut() {
     await authClient.signOut({
       fetchOptions: {
@@ -180,6 +210,8 @@ export const useAuthStore = defineStore("useAuthStore", () => {
     signUpWithEmail,
     sendEmailVerificationOtp,
     verifyEmailWithOtp,
+    requestPasswordReset,
+    resetPassword,
     signOut,
   };
 });

@@ -132,6 +132,10 @@ async function onResendCode() {
       <span v-if="loading" class="loading loading-spinner loading-sm" />
     </button>
 
+    <NuxtLink to="/forgot-password" class="btn btn-ghost w-full">
+      Forgot password?
+    </NuxtLink>
+
     <div v-if="showVerifyActions" class="space-y-2">
       <button
         :disabled="resendLoading || loading || authStore.loading"
