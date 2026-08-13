@@ -40,10 +40,10 @@ const props = defineProps<{
       uppercase
     />
     <AppSelectFormField
-      label="Brand"
-      name="brand"
+      label="Type"
+      name="type"
       :options="TRUCK_BRANDS"
-      :error="errors.brand"
+      :error="errors.type"
       :disabled="loading"
     />
   </AppTruckBaseForm>
