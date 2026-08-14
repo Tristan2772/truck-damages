@@ -12,7 +12,7 @@ export const trucks = sqliteTable("trucks", {
   id: int().primaryKey({ autoIncrement: true }),
   vin: text().notNull(),
   name: text().notNull(),
-  brand: text().notNull(),
+  type: text().notNull(),
   userId: int().notNull().references(() => user.id),
   createdAt: int().notNull().$default(() => Date.now()),
   updatedAt: int().notNull().$default(() => Date.now()).$onUpdate(() => Date.now()),
@@ -23,11 +23,11 @@ export const trucks = sqliteTable("trucks", {
 
 export const InsertTruck = createInsertSchema(trucks, {
   name: z.string().min(1).max(100),
-  brand: z.string().min(1),
+  type: z.string().min(1),
   vin: z.string().min(17).max(17),
 }).pick({
   name: true,
-  brand: true,
+  type: true,
   vin: true,
 });
 

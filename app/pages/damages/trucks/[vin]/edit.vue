@@ -38,6 +38,5 @@ function onSubmitComplete() {
       submit-label="Update"
       submit-icon="tabler:plus"
     />
-    <!-- Jarupdateicon ^^^^  -->
   </div>
 </template>

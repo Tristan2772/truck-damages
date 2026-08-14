@@ -117,7 +117,7 @@ onBeforeRouteUpdate((to) => {
                       }"
                       @click="closeActionsMenu"
                     >
-                      <!-- <AppJarSettingsIcon /> -->
+                      <AppReportSettingsIcon />
                       Edit
                     </NuxtLink>
                   </li>

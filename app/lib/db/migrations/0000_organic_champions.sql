@@ -80,7 +80,7 @@ CREATE TABLE `trucks` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`vin` text NOT NULL,
 	`name` text NOT NULL,
-	`brand` text NOT NULL,
+	`type` text NOT NULL,
 	`user_id` integer NOT NULL,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,

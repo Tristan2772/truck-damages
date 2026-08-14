@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { TRUCK_BRANDS } from "~/lib/constants";
+import { TRUCK_TYPES } from "~/lib/constants";
 import { InsertTruck } from "~/lib/db/schema";
 
 const props = defineProps<{
   initialValues?: InsertTruck;
   submitLabel: string;
-  submitIcon: "JarUpdateIcon" | "tabler:plus";
+  submitIcon: "TruckUpdateIcon" | "tabler:plus";
   onSubmit: (truck: InsertTruck) => Promise<any>;
   onSubmitComplete: () => void;
 }>();
@@ -18,7 +18,7 @@ const props = defineProps<{
     :initial-values="props.initialValues || {
       vin: '',
       name: '',
-      brand: '',
+      type: '',
     }"
     :on-submit
     :on-submit-complete
@@ -42,7 +42,7 @@ const props = defineProps<{
     <AppSelectFormField
       label="Type"
       name="type"
-      :options="TRUCK_BRANDS"
+      :options="TRUCK_TYPES"
       :error="errors.type"
       :disabled="loading"
     />
