@@ -9,7 +9,7 @@ import { useForm } from "vee-validate";
 const props = defineProps<{
   initialValues: T;
   submitLabel: string;
-  submitIcon: "JarUpdateIcon" | "ReportUpdateIcon" | "tabler:plus";
+  submitIcon: "TruckUpdateIcon" | "ReportUpdateIcon" | "tabler:plus";
   schema: ZodType;
   onSubmit: (truck: T) => Promise<any>;
   onSubmitComplete: () => void;
@@ -83,7 +83,8 @@ onBeforeRouteLeave(() => {
       >
         {{ props.submitLabel }}
         <span v-if="loading" class="loading loading-spinner loading-sm" />
-        <AppJarUpdateIcon v-if="!loading && props.submitIcon === 'JarUpdateIcon'" />
+        <AppTruckUpdateIcon v-if="!loading && props.submitIcon === 'TruckUpdateIcon'" />
+        <AppReportUpdateIcon v-if="!loading && props.submitIcon === 'ReportUpdateIcon'" />
         <Icon
           v-if="!loading && props.submitIcon === 'tabler:plus'"
           name="tabler:plus"

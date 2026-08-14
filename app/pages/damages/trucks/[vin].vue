@@ -110,7 +110,7 @@ onBeforeRouteUpdate((to) => {
                       }"
                       @click="closeActionsMenu"
                     >
-                      <AppTruckSettingsIcon />
+                      <!-- <AppTruckSettingsIcon /> -->
                       Edit
                     </NuxtLink>
                   </li>

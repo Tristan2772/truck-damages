@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "1b5f5aa4-0da6-42f7-986c-012067495418",
+  "id": "d5e2ec7c-b4ed-419e-bf52-c2f64f9004fa",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "account": {
@@ -553,8 +553,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "brand": {
-          "name": "brand",
+        "type": {
+          "name": "type",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
