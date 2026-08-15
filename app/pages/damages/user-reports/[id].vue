@@ -11,14 +11,14 @@ const { data: reports, error, status } = await useFetch(
 
 const loading = computed(() => status.value === "pending");
 const errorMessage = computed(() => error.value?.statusMessage || "");
-const userEmail = computed(() => reports.value[0]?.user?.email || "User Reports");
+const userName = computed(() => reports.value[0]?.user?.name || "User Reports");
 </script>
 
 <template>
   <div class="w-full p-4">
     <div class="flex flex-col gap-4">
       <h1 class="text-2xl font-bold">
-        {{ userEmail }}
+        {{ userName }}
       </h1>
 
       <div v-if="loading" class="flex justify-center py-6">

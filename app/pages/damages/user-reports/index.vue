@@ -56,9 +56,9 @@ onBeforeMount(() => {
     <div class="flex flex-col gap-4">
       <div class="grid grid-cols-3 items-center gap-4">
         <h1 class="text-2xl font-bold justify-self-start">
-          User Reports
+          All Users
         </h1>
-        <label class="input input-bordered flex w-full max-w-sm justify-self-center items-center gap-2">
+        <label class="input input-sm input-bordered flex w-full max-w-sm justify-self-end items-center gap-2">
           <Icon name="tabler:search" size="18" />
           <input
             v-model="searchTerm"
@@ -100,15 +100,12 @@ onBeforeMount(() => {
           :to="`/damages/user-reports/${user.id}`"
           class="bg-base-300 hover:bg-base-100 rounded-xl p-4 flex justify-between"
         >
-          <div class="flex flex-col">
+          <div class="flex flex-col truncate">
             <span>
               {{ user.name }}
             </span>
-            <span>
-              {{ user.email }}
-            </span>
           </div>
-          <div class="flex align-center justify-end gap-2">
+          <div v-if="user.amount > 0" class="flex align-center justify-end gap-2 flex-nowrap">
             View {{ user.amount }}<span v-if="user.amount === 1">Report</span><span v-else>Reports</span> <Icon name="tabler:arrow-right" size="24" />
           </div>
         </NuxtLink>
