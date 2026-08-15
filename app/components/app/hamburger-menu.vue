@@ -73,10 +73,16 @@ onBeforeUnmount(() => {
           My Reports
         </NuxtLink>
       </li>
-      <hr>
+      <hr v-if="isManager">
       <li v-if="isManager">
         <NuxtLink to="/damages/add-truck" @click="closeMenu">
           Add Truck
+        </NuxtLink>
+      </li>
+      <hr v-if="isManager">
+      <li v-if="isManager">
+        <NuxtLink to="/damages/user-reports" @click="closeMenu">
+          User Reports
         </NuxtLink>
       </li>
       <hr>

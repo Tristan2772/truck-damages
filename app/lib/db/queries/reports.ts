@@ -89,3 +89,19 @@ export async function findReportsByUserId(userId: number) {
     },
   });
 }
+
+export async function findAllReports() {
+  return db.query.truckReports.findMany({
+    orderBy(fields, operators) {
+      return operators.desc(fields.createdAt);
+    },
+    with: {
+      user: true,
+      images: {
+        orderBy(fields, operators) {
+          return operators.desc(fields.createdAt);
+        },
+      },
+    },
+  });
+}
