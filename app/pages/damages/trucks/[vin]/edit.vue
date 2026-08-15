@@ -36,7 +36,7 @@ function onSubmitComplete() {
       :initial-values="trucksStore.currentTruck"
       :on-submit-complete
       submit-label="Update"
-      submit-icon="tabler:plus"
+      submit-icon="TruckUpdateIcon"
     />
   </div>
 </template>
