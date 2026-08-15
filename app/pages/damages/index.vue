@@ -23,7 +23,7 @@ onBeforeMount(() => {
     </div>
     <!-- ------------------------ if there are trucks -------------------------------- -->
     <div v-if="allTrucks && allTrucks.length > 0 && !(allTrucksStatus === 'pending')" class="flex flex-col">
-      <h2 class="text-2xl p-1 bg-base-200">
+      <h2 class="text-2xl px-4 py-2 bg-base-200">
         All Damages
       </h2>
       <AppBrandWithTrucks :trucks-list="allTrucks">

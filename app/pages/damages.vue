@@ -13,6 +13,9 @@ if (CURRENT_TRUCK_PAGES.has(route.name?.toString() || "")) {
 if (CURRENT_REPORT_PAGES.has(route.name?.toString() || "")) {
   await trucksStore.currentReportRefresh();
 }
+definePageMeta({
+  layout: "damages",
+});
 </script>
 
 <template>
