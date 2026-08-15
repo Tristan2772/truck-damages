@@ -5,12 +5,8 @@
         MAKL Apps
       </NuxtLink>
     </div>
-    <div class="navbar-center flex-1 justify-center">
-      <AppSearchBar />
-    </div>
     <div class="navbar-end flex-1 flex items-center justify-end gap-2">
       <AppThemeToggle />
-      <AppHamburgerMenu />
     </div>
   </div>
 </template>
