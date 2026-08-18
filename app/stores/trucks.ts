@@ -22,6 +22,12 @@ export const useTrucksStore = defineStore("useTrucksStore", () => {
     watch: false,
   });
 
+  const { data: allReports, status: allReportsStatus, error: allReportsError, refresh: allReportsRefresh } = useFetch<SelectTruckReportWithImages[]>("/api/reports/all", {
+    lazy: true,
+    immediate: false,
+    default: () => [],
+  });
+
   return {
     allTrucks,
     allTrucksStatus,
@@ -34,5 +40,9 @@ export const useTrucksStore = defineStore("useTrucksStore", () => {
     currentReportStatus,
     currentReportError,
     currentReportRefresh,
+    allReports,
+    allReportsStatus,
+    allReportsError,
+    allReportsRefresh,
   };
 });

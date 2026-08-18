@@ -1,16 +1,34 @@
 <script lang="ts" setup>
-// import { TRUCK_BRANDS } from "../../lib/constants";
-import { isManagerEmail } from "~/utils/permissions";
+import type { SelectTruckReportImage } from "~/lib/db/schema";
+import type { ReportRecency } from "~/utils/report-recency";
+
+import { getReportRecency } from "~/utils/report-recency";
 
 const trucksStore = useTrucksStore();
-const authStore = useAuthStore();
 const { allTrucks, allTrucksStatus } = storeToRefs(trucksStore);
-const isManager = computed(() => isManagerEmail(authStore.user?.email));
-// const brands = TRUCK_BRANDS;
 
-// function getTrucksOnBrand(brand: string) {
-//   return allTrucks.value?.filter(truck => truck.brand === brand);
-// }
+function getLatestReportCreatedAt(truck: { truckReports: { createdAt: number }[] }): number | undefined {
+  return truck.truckReports.reduce<number | undefined>(
+    (latest, report) => latest === undefined ? report.createdAt : Math.max(latest, report.createdAt),
+    undefined,
+  );
+}
+
+function getLatestTruckActivityAt(truck: { createdAt: number; truckReports: { createdAt: number }[] }) {
+  return getLatestReportCreatedAt(truck) ?? truck.createdAt;
+}
+
+function getTruckRecency(truck: { createdAt: number; truckReports: { createdAt: number }[] }): ReportRecency {
+  return getReportRecency(getLatestTruckActivityAt(truck));
+}
+
+const sortedTrucks = computed(() => [...(allTrucks.value || [])].sort((firstTruck, secondTruck) => getLatestTruckActivityAt(secondTruck) - getLatestTruckActivityAt(firstTruck)));
+
+function getAllImagesForTruck(vin: string): SelectTruckReportImage[] {
+  const truck = allTrucks.value?.find(truck => truck.vin === vin);
+  return truck ? truck.truckReports.flatMap(report => report.images) : [];
+}
+
 onBeforeMount(() => {
   trucksStore.allTrucksRefresh();
 });
@@ -22,36 +40,39 @@ onBeforeMount(() => {
       <span class="loading loading-spinner loading-xl" />
     </div>
     <!-- ------------------------ if there are trucks -------------------------------- -->
-    <div v-if="allTrucks && allTrucks.length > 0 && !(allTrucksStatus === 'pending')" class="flex flex-col">
+    <div v-if="sortedTrucks.length > 0 && !(allTrucksStatus === 'pending')" class="flex flex-col">
       <h2 class="text-2xl px-4 py-2 bg-base-200">
-        All Damages
-      </h2>
-      <AppBrandWithTrucks :trucks-list="allTrucks">
         All Trucks
-      </AppBrandWithTrucks>
-      <!-- ------------- All Brands ------------- -->
-      <!-- <div v-if="brands">
-        <AppBrandWithTrucks
-          v-for="(brand, index) in brands"
-          :key="index"
-          :trucks-list="getTrucksOnBrand(brand)"
+      </h2>
+      <div
+        v-if="sortedTrucks.length > 0"
+        class="flex flex-col gap-4 p-4"
+      >
+        <div
+          v-for="(truck, index) in sortedTrucks"
+          :key="truck.id"
         >
-          {{ brand }}
-        </AppBrandWithTrucks>
-      </div> -->
+          <AppReportRecencyIndicator
+            v-if="index === 0 || getTruckRecency(truck) !== getTruckRecency(sortedTrucks[index - 1]!)"
+            :recency="getTruckRecency(truck)"
+          />
+          <AppFullTruckReport
+            :name="truck.name"
+            :vin="truck.vin"
+            :reports="truck.truckReports"
+            :images="getAllImagesForTruck(truck.vin)"
+          />
+        </div>
+      </div>
     </div>
 
     <!-- ------------------------ If there are no trucks ----------------------------- -->
-    <div v-if="!allTrucks?.length && !(allTrucksStatus === 'pending') && isManager" class="p-4">
+    <div v-if="!allTrucks?.length && !(allTrucksStatus === 'pending')" class="p-4">
       <div class="flex card-compact bg-base-300 max-h-65 min-h-65 aspect-square rounded-full p-3 border-2 border-dashed">
         <div class="card-body text-center flex flex-col items-center justify-center gap-4">
           <p class="text-xl max-h-fit">
             Add a truck to get started.
           </p>
-          <NuxtLink to="/damages/add-truck" class="btn btn-secondary w-40 flex items-center">
-            Add Truck
-            <Icon name="tabler:plus" size="24" />
-          </NuxtLink>
         </div>
       </div>
     </div>

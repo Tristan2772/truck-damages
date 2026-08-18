@@ -10,6 +10,7 @@ const props = defineProps<{
   description: string | null;
   startedAt: number;
   images: SelectTruckReportImage[];
+  reportedById?: number | null;
   reportedByName?: string | null;
   isHovered?: boolean;
 }>();
@@ -46,10 +47,14 @@ const isManager = computed(() => isManagerEmail(authStore.user?.email));
       no images
     </p>
     <div class="flex justify-between items-center">
-      <p v-if="isManager && props.reportedByName" class="text-sm text-gray-500">
+      <NuxtLink
+        v-if="isManager && props.reportedById && props.reportedByName"
+        :to="{ name: 'damages-users-id', params: { id: props.reportedById } }"
+        class="text-sm text-gray-500 hover:underline"
+      >
         <span>Reported by: </span>
         <span> {{ props.reportedByName }}</span>
-      </p>
+      </NuxtLink>
       <NuxtLink
         :to="{ name: 'damages-trucks-vin-reports-id', params: { vin: reportVin, id: props.reportId } }"
         class="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-base-300 focus-visible:bg-base-200 btn btn-primary"

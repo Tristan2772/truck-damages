@@ -64,28 +64,34 @@ onBeforeUnmount(() => {
     >
       <li>
         <NuxtLink to="/damages" @click="closeMenu">
-          All Damages
+          All Trucks
         </NuxtLink>
       </li>
       <hr>
+      <li v-if="isManager">
+        <NuxtLink to="/damages/all-reports" @click="closeMenu">
+          All Reports
+        </NuxtLink>
+      </li>
+      <hr v-if="isManager">
+      <li v-if="isManager">
+        <NuxtLink to="/damages/users" @click="closeMenu">
+          All Users
+        </NuxtLink>
+      </li>
+      <hr v-if="isManager">
       <li>
         <NuxtLink to="/damages/my-reports" @click="closeMenu">
           My Reports
         </NuxtLink>
       </li>
-      <hr v-if="isManager">
+      <hr>
       <li v-if="isManager">
         <NuxtLink to="/damages/add-truck" @click="closeMenu">
           Add Truck
         </NuxtLink>
       </li>
       <hr v-if="isManager">
-      <li v-if="isManager">
-        <NuxtLink to="/damages/user-reports" @click="closeMenu">
-          User Reports
-        </NuxtLink>
-      </li>
-      <hr>
       <li>
         <NuxtLink to="/sign-out" @click="closeMenu">
           Logout

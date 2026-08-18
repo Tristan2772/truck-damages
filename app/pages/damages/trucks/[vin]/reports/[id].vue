@@ -9,6 +9,7 @@ const authStore = useAuthStore();
 const { currentReport: report, currentReportError: error, currentReportStatus: status } = storeToRefs(truckStore);
 const isOpen = ref(false);
 const isActionsMenuOpen = ref(false);
+const actionsMenu = ref<HTMLElement | null>(null);
 const isDeleting = ref(false);
 const deleteError = ref("");
 const loading = computed(() => status.value === "pending" || isDeleting.value);
@@ -26,8 +27,20 @@ function closeActionsMenu() {
   isActionsMenuOpen.value = false;
 }
 
-function closeActionsMenuOnBlur() {
-  window.setTimeout(closeActionsMenu, 0);
+function closeActionsMenuIfFocusLeaves(event: FocusEvent) {
+  const relatedTarget = event.relatedTarget as Node | null;
+
+  if (!relatedTarget || actionsMenu.value?.contains(relatedTarget)) {
+    return;
+  }
+
+  closeActionsMenu();
+}
+
+function closeActionsMenuIfOutside(event: PointerEvent) {
+  if (!actionsMenu.value?.contains(event.target as Node)) {
+    closeActionsMenu();
+  }
 }
 
 function openDialog() {
@@ -54,9 +67,14 @@ async function confirmDelete() {
 }
 
 onMounted(() => {
+  document.addEventListener("pointerdown", closeActionsMenuIfOutside);
   setTimeout(() => {
     truckStore.currentReportRefresh();
   }, 0);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("pointerdown", closeActionsMenuIfOutside);
 });
 
 onBeforeRouteUpdate((to) => {
@@ -93,14 +111,15 @@ onBeforeRouteUpdate((to) => {
               <span class="w-full">{{ report.name }}</span>
               <div
                 v-if="canManageReport"
+                ref="actionsMenu"
                 class="dropdown dropdown-bottom dropdown-end"
                 :class="{ 'dropdown-open': isActionsMenuOpen }"
+                @focusout="closeActionsMenuIfFocusLeaves"
               >
                 <button
                   tabindex="0"
                   class="btn btn-sm btn-ghost hover:bg-base-100 p-2"
                   type="button"
-                  @blur="closeActionsMenuOnBlur"
                   @click="isActionsMenuOpen = !isActionsMenuOpen"
                 >
                   <Icon name="tabler:dots-vertical" size="18" />
