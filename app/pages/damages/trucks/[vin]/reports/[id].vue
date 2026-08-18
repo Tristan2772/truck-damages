@@ -124,6 +124,14 @@ onBeforeRouteUpdate((to) => {
                 >
                   <Icon name="tabler:dots-vertical" size="18" />
                 </button>
+                <button
+                  v-if="isActionsMenuOpen"
+                  tabindex="-1"
+                  class="fixed inset-0 z-0 cursor-default"
+                  type="button"
+                  aria-label="Close menu"
+                  @click="closeActionsMenu"
+                />
                 <ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm mb-2 border-2 border-secondary">
                   <li>
                     <NuxtLink
