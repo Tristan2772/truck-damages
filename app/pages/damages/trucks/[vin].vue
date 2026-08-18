@@ -9,14 +9,27 @@ const { currentTruck: truck, currentTruckError: error, currentTruckStatus: statu
 const route = useRoute();
 const isOpen = ref(false);
 const isActionsMenuOpen = ref(false);
+const actionsMenu = ref<HTMLElement | null>(null);
 const isManager = computed(() => isManagerEmail(authStore.user?.email));
 
 function closeActionsMenu() {
   isActionsMenuOpen.value = false;
 }
 
-function closeActionsMenuOnBlur() {
-  window.setTimeout(closeActionsMenu, 0);
+function closeActionsMenuIfFocusLeaves(event: FocusEvent) {
+  const relatedTarget = event.relatedTarget as Node | null;
+
+  if (!relatedTarget || actionsMenu.value?.contains(relatedTarget)) {
+    return;
+  }
+
+  closeActionsMenu();
+}
+
+function closeActionsMenuIfOutside(event: PointerEvent) {
+  if (!actionsMenu.value?.contains(event.target as Node)) {
+    closeActionsMenu();
+  }
 }
 
 function openDialog() {
@@ -48,9 +61,14 @@ async function confirmDelete() {
 }
 
 onMounted(() => {
+  document.addEventListener("pointerdown", closeActionsMenuIfOutside);
   setTimeout(() => {
     truckStore.currentTruckRefresh();
   }, 0);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("pointerdown", closeActionsMenuIfOutside);
 });
 
 onBeforeRouteUpdate((to) => {
@@ -87,14 +105,15 @@ onBeforeRouteUpdate((to) => {
               <span>{{ truck.name }}</span>
               <div
                 v-if="isManager"
+                ref="actionsMenu"
                 class="dropdown dropdown-bottom dropdown-end"
                 :class="{ 'dropdown-open': isActionsMenuOpen }"
+                @focusout="closeActionsMenuIfFocusLeaves"
               >
                 <button
                   tabindex="0"
                   class="btn btn-sm btn-ghost hover:bg-base-100 p-2"
                   type="button"
-                  @blur="closeActionsMenuOnBlur"
                   @click="isActionsMenuOpen = !isActionsMenuOpen"
                 >
                   <Icon name="tabler:dots-vertical" size="18" />
@@ -141,6 +160,7 @@ onBeforeRouteUpdate((to) => {
               :description="report.description"
               :started-at="report.createdAt"
               :images="report.images"
+              :reported-by-id="report.user.id"
               :reported-by-name="report.user.name"
               class="zig-zag transition-all duration-300"
             />

@@ -18,7 +18,7 @@ const userName = computed(() => reports.value[0]?.user?.name || "User Reports");
   <div class="w-full p-4">
     <div class="flex flex-col gap-4">
       <h1 class="text-2xl font-bold">
-        {{ userName }}
+        {{ userName }}'s Reports
       </h1>
 
       <div v-if="loading" class="flex justify-center py-6">
@@ -51,6 +51,7 @@ const userName = computed(() => reports.value[0]?.user?.name || "User Reports");
           :description="report.description"
           :started-at="report.createdAt"
           :images="report.images"
+          :reported-by-id="report.user.id"
           :reported-by-name="report.user.name"
           class="zig-zag transition-all duration-300"
         />

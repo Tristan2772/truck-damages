@@ -7,6 +7,7 @@ const searchResults = ref<HeaderSearchResult[]>([]);
 const searchError = ref("");
 const isSearchOpen = ref(false);
 const isSearching = ref(false);
+const searchContainer = ref<HTMLElement | null>(null);
 let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const trimmedSearchTerm = computed(() => searchTerm.value.trim());
@@ -52,17 +53,20 @@ function queueSearch() {
   }, 200);
 }
 
-function closeSearch(event?: FocusEvent) {
-  const relatedTarget = event?.relatedTarget as HTMLElement | null;
-  const isInsideSearch = relatedTarget?.closest("[data-search-interaction]");
+function closeSearchIfFocusLeaves(event: FocusEvent) {
+  const relatedTarget = event.relatedTarget as Node | null;
 
-  if (isInsideSearch) {
+  if (!relatedTarget || searchContainer.value?.contains(relatedTarget)) {
     return;
   }
 
-  setTimeout(() => {
+  isSearchOpen.value = false;
+}
+
+function closeSearchIfOutside(event: PointerEvent) {
+  if (!searchContainer.value?.contains(event.target as Node)) {
     isSearchOpen.value = false;
-  }, 100);
+  }
 }
 
 function handleResultClick() {
@@ -84,11 +88,21 @@ onBeforeUnmount(() => {
   if (searchTimeout) {
     clearTimeout(searchTimeout);
   }
+
+  document.removeEventListener("pointerdown", closeSearchIfOutside);
+});
+
+onMounted(() => {
+  document.addEventListener("pointerdown", closeSearchIfOutside);
 });
 </script>
 
 <template>
-  <div class="dropdown dropdown-center w-full max-w-80">
+  <div
+    ref="searchContainer"
+    class="dropdown dropdown-center w-full max-w-80"
+    @focusout="closeSearchIfFocusLeaves"
+  >
     <label data-search-interaction class="input input-sm input-bordered flex w-full items-center gap-2 border-red-950/80 bg-red-950/70 text-gray-100 shadow-md">
       <Icon name="tabler:search" size="18" />
       <input
@@ -97,7 +111,6 @@ onBeforeUnmount(() => {
         class="grow placeholder:text-gray-300/75"
         placeholder="Search..."
         @focus="isSearchOpen = true"
-        @blur="closeSearch"
       >
     </label>
 

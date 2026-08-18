@@ -97,7 +97,7 @@ onBeforeMount(() => {
         <NuxtLink
           v-for="user in filteredUsers"
           :key="user.id"
-          :to="`/damages/user-reports/${user.id}`"
+          :to="`/damages/users/${user.id}`"
           class="bg-base-300 hover:bg-base-100 rounded-xl p-4 flex justify-between"
         >
           <div class="flex flex-col truncate">
