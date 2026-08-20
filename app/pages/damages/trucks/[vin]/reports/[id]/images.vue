@@ -4,6 +4,7 @@ import { FetchError } from "ofetch";
 import type { SelectTruckReportImage } from "~/lib/db/schema";
 
 import { isManagerEmail } from "~/utils/permissions";
+import { uploadTruckReportImage } from "~/utils/upload-truck-report-image";
 
 const truckStore = useTrucksStore();
 const { currentReport: report } = storeToRefs(truckStore);
@@ -46,66 +47,14 @@ function selectImage(event: Event) {
   }
 }
 
-async function getChecksum(blob: Blob): Promise<string | null> {
-  const subtle = globalThis.crypto?.subtle;
-
-  if (!subtle) {
-    return null;
-  }
-
-  const arrayBuffer = await blob.arrayBuffer();
-  const hashBuffer = await subtle.digest("SHA-256", arrayBuffer);
-  return btoa(String.fromCharCode(...new Uint8Array(hashBuffer)));
-}
-
-async function prepareImageForUpload(file: File): Promise<Blob> {
-  const objectUrl = URL.createObjectURL(file);
-
-  try {
-    const imageElement = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const image = new Image();
-      image.onload = () => resolve(image);
-      image.onerror = () => reject(new Error("Unable to read image file."));
-      image.src = objectUrl;
-    });
-
-    const naturalWidth = imageElement.naturalWidth || imageElement.width;
-    const naturalHeight = imageElement.naturalHeight || imageElement.height;
-    const maxDimension = 1000;
-
-    if (naturalWidth <= maxDimension && naturalHeight <= maxDimension) {
-      return file;
-    }
-
-    const canvas = document.createElement("canvas");
-    const width = Math.min(maxDimension, naturalWidth);
-    const height = Math.min(maxDimension, naturalHeight);
-    canvas.width = width;
-    canvas.height = height;
-
-    const context = canvas.getContext("2d");
-    if (!context) {
-      return file;
-    }
-
-    context.drawImage(imageElement, 0, 0, width, height);
-
-    const blob = await new Promise<Blob | null>((resolve) => {
-      canvas.toBlob(resolve, "image/jpeg", 0.9);
-    });
-
-    return blob || file;
-  }
-  catch {
-    return file;
-  }
-  finally {
-    URL.revokeObjectURL(objectUrl);
-  }
-}
-
 async function uploadImage() {
   if (!image.value || !previewUrl.value) {
+    return;
+  }
+
+  const vin = route.params.vin?.toString();
+  if (!vin) {
+    errorMessage.value = "Truck VIN is missing.";
     return;
   }
 
@@ -113,35 +62,12 @@ async function uploadImage() {
   loading.value = true;
 
   try {
-    const blob = await prepareImageForUpload(image.value);
-    const uploadBlob = blob.size > 0 ? blob : image.value;
-    const checksum = await getChecksum(uploadBlob);
-
-    const { fields, key, url } = await $csrfFetch(`/api/trucks/${route.params.vin}/${route.params.id}/sign-image`, {
-      method: "POST",
-      body: {
-        contentLength: uploadBlob.size,
-        ...(checksum ? { checksum } : {}),
-      },
-    });
-
-    const formData = new FormData();
-    Object.entries(fields).forEach(([key, value]) => {
-      formData.append(key, value as string);
-    });
-    formData.append("file", uploadBlob);
-
-    await $fetch(url, {
-      method: "POST",
-      body: formData,
-    });
-
-    await $csrfFetch(`/api/trucks/${route.params.vin}/${route.params.id}/image`, {
-      method: "POST",
-      body: {
-        key,
-      },
-    });
+    await uploadTruckReportImage(
+      $csrfFetch,
+      vin,
+      Number(route.params.id),
+      image.value,
+    );
 
     await truckStore.currentReportRefresh();
     image.value = null;
