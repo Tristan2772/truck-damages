@@ -177,7 +177,7 @@ onBeforeRouteUpdate((to) => {
           <div class="bg-base-100">
             <div class="card-body text-center flex flex-col items-center justify-center gap-4">
               <p class="text-lg max-h-fit">
-                Add a new damage report. After creating the report, you can add images to the report to visually document the damage.
+                Add a new damage report. Add images to the report to visually document the damage.
               </p>
               <NuxtLink :to="{ name: 'damages-trucks-vin-reports-add', params: { vin: route.params.vin } }" class="btn btn-secondary w-40 flex align-center">
                 New Report

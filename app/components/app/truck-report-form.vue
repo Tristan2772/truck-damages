@@ -37,7 +37,7 @@ const formInitialValues = computed(() => props.initialValues || defaultValues);
       :disabled="loading"
     />
     <AppFormField
-      label="Description"
+      label="Description (optional)"
       name="description"
       type="textarea"
       :error="errors.description"
@@ -49,5 +49,6 @@ const formInitialValues = computed(() => props.initialValues || defaultValues);
       :error="errors.truckVin"
       :disabled="loading"
     />
+    <slot :loading />
   </AppTruckBaseForm>
 </template>
