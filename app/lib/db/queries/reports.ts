@@ -22,6 +22,7 @@ export async function findReport(reportId: number) {
     ),
     with: {
       user: true,
+      assignedUser: true,
       images: {
         orderBy(fields, operators) {
           return operators.desc(fields.createdAt);
@@ -81,6 +82,7 @@ export async function findReportsByUserId(userId: number) {
     },
     with: {
       user: true,
+      assignedUser: true,
       images: {
         orderBy(fields, operators) {
           return operators.desc(fields.createdAt);
@@ -97,6 +99,7 @@ export async function findAllReports() {
     },
     with: {
       user: true,
+      assignedUser: true,
       images: {
         orderBy(fields, operators) {
           return operators.desc(fields.createdAt);

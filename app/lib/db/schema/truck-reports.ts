@@ -19,12 +19,15 @@ export const truckReports = sqliteTable("truckReports", {
   userId: int().notNull().references(() => user.id),
   createdAt: int().notNull().$default(() => Date.now()),
   updatedAt: int().notNull().$default(() => Date.now()).$onUpdate(() => Date.now()),
+  isGrounded: int({ mode: "boolean" }).notNull().default(false),
+  assignedTo: int(),
 });
 
 export const InsertTruckReport = createInsertSchema(truckReports, {
   name: z.string().min(1).max(100),
   description: z.string().max(1000).optional().nullable(),
   truckVin: z.string().min(17).max(17),
+  assignedTo: z.number().int().positive().nullable().optional(),
 }).omit({
   id: true,
   userId: true,
@@ -42,6 +45,10 @@ export const TruckReportsRelations = relations(truckReports, ({ one, many }) => 
     fields: [truckReports.truckId],
     references: [trucks.id],
   }),
+  assignedUser: one(user, {
+    fields: [truckReports.assignedTo],
+    references: [user.id],
+  }),
   images: many(truckReportImages),
 }));
 
@@ -50,4 +57,5 @@ export type InsertTruckReport = z.infer<typeof InsertTruckReport>;
 export type SelectTruckReportWithImages = SelectTruckReport & {
   images: SelectTruckReportImage[];
   user: SelectUser;
+  assignedUser: SelectUser | null;
 };

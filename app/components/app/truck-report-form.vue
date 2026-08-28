@@ -1,8 +1,12 @@
 <script lang="ts" setup>
-import { InsertTruckReport } from "~/lib/db/schema";
+import type { InsertTruckReport, SelectUser } from "~/lib/db/schema";
+
+import { InsertTruckReport as InsertTruckReportSchema } from "~/lib/db/schema";
+import { isManagerUser } from "~/utils/permissions";
 
 const props = defineProps<{
   initialValues?: InsertTruckReport;
+  initialAssignedUser?: SelectUser | null;
   submitLabel: string;
   submitIcon: "ReportUpdateIcon" | "tabler:plus";
   onSubmit: (report: InsertTruckReport) => Promise<any>;
@@ -10,11 +14,14 @@ const props = defineProps<{
 }>();
 
 const route = useRoute();
+const authStore = useAuthStore();
+const isManager = computed(() => isManagerUser(authStore.user));
 
 const defaultValues: InsertTruckReport = {
   name: "",
   description: "",
   truckVin: route.params.vin?.toString() || "",
+  isGrounded: false,
 };
 
 const formInitialValues = computed(() => props.initialValues || defaultValues);
@@ -23,7 +30,7 @@ const formInitialValues = computed(() => props.initialValues || defaultValues);
 <template>
   <AppTruckBaseForm
     v-slot="{ errors, loading }"
-    :schema="InsertTruckReport"
+    :schema="InsertTruckReportSchema"
     :initial-values="formInitialValues"
     :on-submit
     :on-submit-complete
@@ -47,6 +54,20 @@ const formInitialValues = computed(() => props.initialValues || defaultValues);
       label="Truck Vin"
       name="truckVin"
       :error="errors.truckVin"
+      :disabled="loading"
+    />
+    <AppCheckboxField
+      label="This damage grounds the vehicle"
+      name="isGrounded"
+      :error="errors.isGrounded"
+      :disabled="loading"
+    />
+    <AppUserSelectField
+      v-if="isManager"
+      label="Assign damage to"
+      name="assignedTo"
+      :initial-user="initialAssignedUser"
+      :error="errors.assignedTo"
       :disabled="loading"
     />
     <slot :loading />
