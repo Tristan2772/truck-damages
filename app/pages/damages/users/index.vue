@@ -1,35 +1,12 @@
 <script lang="ts" setup>
-const { data: reports, error, status, refresh } = await useFetch("/api/reports/all", {
+import type { UserWithReportCount } from "~/lib/db/queries/users";
+
+import { getReportRecency } from "~/utils/report-recency";
+
+const { data: users, error, status, refresh } = await useFetch<UserWithReportCount[]>("/api/users", {
   default: () => [],
 });
 const searchTerm = ref("");
-
-const users = computed(() => {
-  const uniqueUsers = new Map<number, { id: number; email: string; name: string; amount: number }>();
-
-  for (const report of reports.value) {
-    if (report.user?.id && report.user.email) {
-      const userId = Number(report.user.id);
-      const existingUser = uniqueUsers.get(userId);
-
-      if (existingUser) {
-        existingUser.amount += 1;
-      }
-      else {
-        uniqueUsers.set(userId, {
-          id: userId,
-          email: report.user.email,
-          name: report.user.name,
-          amount: 1,
-        });
-      }
-    }
-  }
-
-  return [...uniqueUsers.values()].sort((firstUser, secondUser) =>
-    firstUser.email.localeCompare(secondUser.email),
-  );
-});
 
 const filteredUsers = computed(() => {
   const search = searchTerm.value.trim().toLowerCase();
@@ -45,6 +22,19 @@ const filteredUsers = computed(() => {
 
 const loading = computed(() => status.value === "pending");
 const errorMessage = computed(() => error.value?.statusMessage || "");
+const usersWithRecency = computed(() => filteredUsers.value.map((user, index, users) => {
+  const recency = user.latestReportAt === null ? null : getReportRecency(user.latestReportAt);
+  const previousUser = users[index - 1];
+  const previousRecency = previousUser?.latestReportAt === null || previousUser?.latestReportAt === undefined
+    ? null
+    : getReportRecency(previousUser.latestReportAt);
+
+  return {
+    user,
+    recency,
+    showRecency: recency !== null && (index === 0 || recency !== previousRecency),
+  };
+}));
 
 onBeforeMount(() => {
   refresh();
@@ -83,7 +73,7 @@ onBeforeMount(() => {
       </div>
 
       <div v-if="!loading && !errorMessage && users.length === 0" class="alert alert-info">
-        <span>No users have created any reports yet.</span>
+        <span>No users found.</span>
       </div>
 
       <div v-else-if="!loading && !errorMessage && filteredUsers.length === 0" class="alert alert-info">
@@ -94,21 +84,25 @@ onBeforeMount(() => {
         v-if="!loading && !errorMessage && filteredUsers.length > 0"
         class="flex flex-col gap-2 w-full"
       >
-        <NuxtLink
-          v-for="user in filteredUsers"
-          :key="user.id"
-          :to="`/damages/users/${user.id}`"
-          class="bg-base-300 hover:bg-base-100 rounded-xl p-4 flex justify-between"
-        >
-          <div class="flex flex-col truncate">
-            <span>
-              {{ user.name }}
-            </span>
-          </div>
-          <div v-if="user.amount > 0" class="flex align-center justify-end gap-2 flex-nowrap">
-            View {{ user.amount }}<span v-if="user.amount === 1">Report</span><span v-else>Reports</span> <Icon name="tabler:arrow-right" size="24" />
-          </div>
-        </NuxtLink>
+        <template v-for="userWithRecency in usersWithRecency" :key="userWithRecency.user.id">
+          <AppReportRecencyIndicator
+            v-if="userWithRecency.showRecency"
+            :recency="userWithRecency.recency!"
+          />
+          <NuxtLink
+            :to="`/damages/users/${userWithRecency.user.id}`"
+            class="bg-base-300 hover:bg-base-100 rounded-xl p-4 flex justify-between"
+          >
+            <div class="flex flex-col truncate">
+              <span>
+                {{ userWithRecency.user.name }}
+              </span>
+            </div>
+            <div v-if="userWithRecency.user.amount > 0" class="flex align-center justify-end gap-2 flex-nowrap">
+              View {{ userWithRecency.user.amount }}<span v-if="userWithRecency.user.amount === 1">Report</span><span v-else>Reports</span> <Icon name="tabler:arrow-right" size="24" />
+            </div>
+          </NuxtLink>
+        </template>
       </div>
     </div>
   </div>

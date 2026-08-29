@@ -1,9 +1,29 @@
-import { like, or } from "drizzle-orm";
+import { asc, count, desc, eq, like, max, or } from "drizzle-orm";
 
 import db from "..";
-import { user } from "../schema";
+import { truckReports, user } from "../schema";
 
 export type UserSearchResult = Pick<typeof user.$inferSelect, "id" | "name" | "email">;
+export type UserWithReportCount = UserSearchResult & { amount: number; latestReportAt: number | null };
+
+export async function findAllUsers(): Promise<UserWithReportCount[]> {
+  const rows = await db.select({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    amount: count(truckReports.id),
+    latestReportAt: max(truckReports.createdAt),
+  }).from(user).leftJoin(
+    truckReports,
+    eq(user.id, truckReports.userId),
+  ).groupBy(user.id).orderBy(desc(max(truckReports.createdAt)), asc(user.email));
+
+  return rows.map(row => ({
+    ...row,
+    amount: Number(row.amount),
+    latestReportAt: row.latestReportAt === null ? null : Number(row.latestReportAt),
+  }));
+}
 
 export async function findUserById(userId: number) {
   return db.query.user.findFirst({

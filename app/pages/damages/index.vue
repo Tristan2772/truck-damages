@@ -55,6 +55,7 @@ onBeforeMount(() => {
           <AppReportRecencyIndicator
             v-if="index === 0 || getTruckRecency(truck) !== getTruckRecency(sortedTrucks[index - 1]!)"
             :recency="getTruckRecency(truck)"
+            class="pt-4 pb-8"
           />
           <AppFullTruckReport
             :name="truck.name"
