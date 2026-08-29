@@ -1,10 +1,22 @@
 <script lang="ts" setup>
+import { getReportRecency } from "~/utils/report-recency";
+
 const { data: reports, error, status, refresh } = await useFetch("/api/reports/my", {
   default: () => [],
 });
 
 const loading = computed(() => status.value === "pending");
 const errorMessage = computed(() => error.value?.statusMessage || "");
+const reportsWithRecency = computed(() => reports.value.map((report, index, allReports) => {
+  const recency = getReportRecency(report.createdAt);
+  const previousReport = allReports[index - 1];
+
+  return {
+    report,
+    recency,
+    showRecency: index === 0 || !previousReport || recency !== getReportRecency(previousReport.createdAt),
+  };
+}));
 
 onBeforeMount(() => {
   refresh();
@@ -39,19 +51,25 @@ onBeforeMount(() => {
         v-if="!loading && !errorMessage && reports.length > 0"
         class="flex flex-col gap-8 w-full"
       >
-        <AppTruckReport
-          v-for="report in reports"
-          :key="report.id"
-          :report-id="report.id"
-          :vin="report.truckVin"
-          :name="report.name"
-          :description="report.description"
-          :started-at="report.createdAt"
-          :images="report.images"
-          :reported-by-id="report.user.id"
-          :reported-by-name="report.user.name"
-          class="zig-zag transition-all duration-300"
-        />
+        <template v-for="reportWithRecency in reportsWithRecency" :key="reportWithRecency.report.id">
+          <AppReportRecencyIndicator
+            v-if="reportWithRecency.showRecency"
+            :recency="reportWithRecency.recency"
+          />
+          <AppTruckReport
+            :report-id="reportWithRecency.report.id"
+            :vin="reportWithRecency.report.truckVin"
+            :name="reportWithRecency.report.name"
+            :description="reportWithRecency.report.description"
+            :started-at="reportWithRecency.report.createdAt"
+            :images="reportWithRecency.report.images"
+            :reported-by-id="reportWithRecency.report.user.id"
+            :reported-by-name="reportWithRecency.report.user.name"
+            :assigned-to-id="reportWithRecency.report.assignedTo"
+            :assigned-to-name="reportWithRecency.report.assignedUser?.name"
+            class="zig-zag transition-all duration-300"
+          />
+        </template>
       </div>
     </div>
   </div>

@@ -12,6 +12,8 @@ const props = defineProps<{
   images: SelectTruckReportImage[];
   reportedById?: number | null;
   reportedByName?: string | null;
+  assignedToId?: number | null;
+  assignedToName?: string | null;
   isHovered?: boolean;
 }>();
 
@@ -47,14 +49,25 @@ const isManager = computed(() => isManagerEmail(authStore.user?.email));
       no images
     </p>
     <div class="flex justify-between items-center">
-      <NuxtLink
-        v-if="isManager && props.reportedById && props.reportedByName"
-        :to="{ name: 'damages-users-id', params: { id: props.reportedById } }"
-        class="text-sm text-gray-500 hover:underline"
-      >
-        <span>Reported by: </span>
-        <span> {{ props.reportedByName }}</span>
-      </NuxtLink>
+      <div class="flex flex-col gap-2">
+        <NuxtLink
+          v-if="isManager && props.reportedById && props.reportedByName"
+          :to="{ name: 'damages-users-id', params: { id: props.reportedById } }"
+          class="text-sm text-gray-500 hover:underline"
+        >
+          <span>Reported by: </span>
+          <span> {{ props.reportedByName }}</span>
+        </NuxtLink>
+
+        <NuxtLink
+          v-if="isManager && props.assignedToId && props.assignedToName"
+          :to="{ name: 'damages-users-id', params: { id: props.assignedToId } }"
+          class="text-sm text-gray-500 hover:underline"
+        >
+          <span>Assigned to: </span>
+          <span> {{ props.assignedToName }}</span>
+        </NuxtLink>
+      </div>
       <NuxtLink
         :to="{ name: 'damages-trucks-vin-reports-id', params: { vin: reportVin, id: props.reportId } }"
         class="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-base-300 focus-visible:bg-base-200 btn btn-primary"
