@@ -1,3 +1,5 @@
+import z from "zod";
+
 import { findAllUsers } from "~/lib/db/queries/users";
 import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-handler";
 import { isManagerUser } from "~/utils/permissions";
@@ -10,5 +12,6 @@ export default defineAuthenticatedEventHandler(async (event) => {
     });
   }
 
-  return findAllUsers();
+  const mode = z.enum(["created", "assigned"]).catch("created").parse(getQuery(event).mode);
+  return findAllUsers(mode);
 });

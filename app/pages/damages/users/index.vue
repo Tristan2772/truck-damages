@@ -3,7 +3,10 @@ import type { UserWithReportCount } from "~/lib/db/queries/users";
 
 import { getReportRecency } from "~/utils/report-recency";
 
-const { data: users, error, status, refresh } = await useFetch<UserWithReportCount[]>("/api/users", {
+const showAssigned = ref(false);
+const mode = computed(() => showAssigned.value ? "assigned" : "created");
+
+const { data: users, error, status, refresh } = await useFetch<UserWithReportCount[]>(() => `/api/users?mode=${mode.value}`, {
   default: () => [],
 });
 const searchTerm = ref("");
@@ -54,8 +57,16 @@ onBeforeMount(() => {
             v-model="searchTerm"
             type="search"
             class="grow"
-            placeholder="Search users..."
+            placeholder="Search..."
           >
+        </label>
+        <label class="label cursor-pointer justify-self-end gap-2">
+          <input
+            v-model="showAssigned"
+            type="checkbox"
+            class="checkbox checkbox-sm"
+          >
+          <span class="label-text">Damages</span>
         </label>
       </div>
 
@@ -90,7 +101,11 @@ onBeforeMount(() => {
             :recency="userWithRecency.recency!"
           />
           <NuxtLink
-            :to="`/damages/users/${userWithRecency.user.id}`"
+            :to="{
+              name: 'damages-users-id',
+              params: { id: userWithRecency.user.id },
+              query: { mode },
+            }"
             class="bg-base-300 hover:bg-base-100 rounded-xl p-4 flex justify-between"
           >
             <div class="flex flex-col truncate">
@@ -99,7 +114,10 @@ onBeforeMount(() => {
               </span>
             </div>
             <div v-if="userWithRecency.user.amount > 0" class="flex align-center justify-end gap-2 flex-nowrap">
-              View {{ userWithRecency.user.amount }}<span v-if="userWithRecency.user.amount === 1">Report</span><span v-else>Reports</span> <Icon name="tabler:arrow-right" size="24" />
+              View {{ userWithRecency.user.amount }}
+              <span v-if="mode === 'assigned'">Damage<span v-if="userWithRecency.user.amount !== 1">s</span></span>
+              <span v-else>Report<span v-if="userWithRecency.user.amount !== 1">s</span></span>
+              <Icon name="tabler:arrow-right" size="24" />
             </div>
           </NuxtLink>
         </template>

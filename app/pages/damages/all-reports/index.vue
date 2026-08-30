@@ -60,22 +60,24 @@ onBeforeMount(() => {
         v-if="allReportsStatus !== 'pending' && !allReportsError && allReports.length > 0"
         class="flex flex-col gap-8 w-full"
       >
-        <template v-for="reportWithRecency in reportsWithRecency" :key="reportWithRecency.report.id">
+        <template v-for="report in reportsWithRecency" :key="report.report.id">
           <AppReportRecencyIndicator
-            v-if="reportWithRecency.showRecency"
-            :recency="reportWithRecency.recency"
+            v-if="report.showRecency"
+            :recency="report.recency"
           />
           <AppTruckReport
-            :report-id="reportWithRecency.report.id"
-            :vin="reportWithRecency.report.truckVin"
-            :name="reportWithRecency.report.name"
-            :description="reportWithRecency.report.description"
-            :started-at="reportWithRecency.report.createdAt"
-            :images="reportWithRecency.report.images"
-            :reported-by-id="reportWithRecency.report.user.id"
-            :reported-by-name="reportWithRecency.report.user.name"
-            :assigned-to-id="reportWithRecency.report.assignedTo"
-            :assigned-to-name="reportWithRecency.report.assignedUser?.name"
+            :report-id="report.report.id"
+            :vin="report.report.truckVin"
+            :name="report.report.name"
+            :description="report.report.description"
+            :started-at="report.report.createdAt"
+            :images="report.report.images"
+            :reported-by-id="report.report.user.id"
+            :reported-by-name="report.report.user.name"
+            :assigned-to-id="report.report.assignedTo"
+            :assigned-to-name="report.report.assignedUser?.name"
+            :repaired-by-id="report.report.repairedByUserId"
+            :repaired-by-name="report.report.repairedUser?.name"
             class="zig-zag transition-all duration-300"
           />
         </template>

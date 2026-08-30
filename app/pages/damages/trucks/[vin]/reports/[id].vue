@@ -20,7 +20,7 @@ const canManageReport = computed(() => {
     return false;
   }
 
-  return isManager.value || Number(authStore.user.id) === report.value.userId;
+  return (isManager.value || Number(authStore.user.id) === report.value.userId) && !report.value.repairedAt;
 });
 
 function closeActionsMenu() {
@@ -133,8 +133,9 @@ onBeforeRouteUpdate((to) => {
                   @click="closeActionsMenu"
                 />
                 <ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm mb-2 border-2 border-secondary">
-                  <li>
+                  <li v-if="!report.repairedAt">
                     <NuxtLink
+
                       :to="{
                         name: 'damages-trucks-vin-reports-id-edit',
                         params: {
@@ -148,7 +149,22 @@ onBeforeRouteUpdate((to) => {
                       Edit
                     </NuxtLink>
                   </li>
-                  <li>
+                  <li v-if="isManager && !report.repairedAt">
+                    <NuxtLink
+                      :to="{
+                        name: 'damages-trucks-vin-reports-id-add-repair',
+                        params: {
+                          vin: route.params.vin,
+                          id: report.id,
+                        },
+                      }"
+                      @click="closeActionsMenu"
+                    >
+                      <AppWrenchIcon />
+                      Mark as Repaired
+                    </NuxtLink>
+                  </li>
+                  <li v-if="canManageReport">
                     <NuxtLink to="" @click="openDialog">
                       <Icon name="tabler:trash-x-filled" size="24" />
                       Delete
@@ -172,7 +188,16 @@ onBeforeRouteUpdate((to) => {
               :enable-lightbox="true"
             />
           </div>
-          <div v-if="canManageReport">
+          <div v-if="report.repairedAt" class="w-full card-body text-center flex flex-col items-center justify-center gap-4">
+            <NuxtLink
+              :to="{ name: 'damages-trucks-vin-reports-id-repair', params: { vin: route.params.vin, id: report.id } }"
+              class="btn btn-secondary w-60"
+            >
+              View Repair Notes
+              <AppWrenchIcon />
+            </NuxtLink>
+          </div>
+          <div v-else-if="canManageReport">
             <div class="w-full card-body text-center flex flex-col items-center justify-center gap-4">
               <NuxtLink :to="{ name: 'damages-trucks-vin-reports-id-images', params: { vin: route.params.vin, id: report.id } }" class="btn btn-secondary w-60">
                 Add/Manage Images
