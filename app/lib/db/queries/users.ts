@@ -5,8 +5,9 @@ import { truckReports, user } from "../schema";
 
 export type UserSearchResult = Pick<typeof user.$inferSelect, "id" | "name" | "email">;
 export type UserWithReportCount = UserSearchResult & { amount: number; latestReportAt: number | null };
+export type UserReportMode = "created" | "assigned";
 
-export async function findAllUsers(): Promise<UserWithReportCount[]> {
+export async function findAllUsers(mode: UserReportMode = "created"): Promise<UserWithReportCount[]> {
   const rows = await db.select({
     id: user.id,
     name: user.name,
@@ -15,7 +16,7 @@ export async function findAllUsers(): Promise<UserWithReportCount[]> {
     latestReportAt: max(truckReports.createdAt),
   }).from(user).leftJoin(
     truckReports,
-    eq(user.id, truckReports.userId),
+    eq(user.id, mode === "created" ? truckReports.userId : truckReports.assignedTo),
   ).groupBy(user.id).orderBy(desc(max(truckReports.createdAt)), asc(user.email));
 
   return rows.map(row => ({

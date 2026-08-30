@@ -21,6 +21,10 @@ export const truckReports = sqliteTable("truckReports", {
   updatedAt: int().notNull().$default(() => Date.now()).$onUpdate(() => Date.now()),
   isGrounded: int({ mode: "boolean" }).notNull().default(false),
   assignedTo: int(),
+  repairedByUserId: int().references(() => user.id),
+  repairedBy: text(),
+  repairedAt: int(),
+  repairCostCents: int(),
 });
 
 export const InsertTruckReport = createInsertSchema(truckReports, {
@@ -49,6 +53,10 @@ export const TruckReportsRelations = relations(truckReports, ({ one, many }) => 
     fields: [truckReports.assignedTo],
     references: [user.id],
   }),
+  repairedUser: one(user, {
+    fields: [truckReports.repairedByUserId],
+    references: [user.id],
+  }),
   images: many(truckReportImages),
 }));
 
@@ -58,4 +66,5 @@ export type SelectTruckReportWithImages = SelectTruckReport & {
   images: SelectTruckReportImage[];
   user: SelectUser;
   assignedUser: SelectUser | null;
+  repairedUser: SelectUser | null;
 };

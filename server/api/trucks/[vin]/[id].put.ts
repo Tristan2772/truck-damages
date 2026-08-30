@@ -32,6 +32,13 @@ export default defineAuthenticatedEventHandler(async (event) => {
     });
   }
 
+  if (report.repairedAt) {
+    return createError({
+      statusCode: 409,
+      statusMessage: "Repaired reports cannot be edited.",
+    });
+  }
+
   if (isManager && result.data.assignedTo != null && !await findUserById(result.data.assignedTo)) {
     throw createError({
       statusCode: 422,

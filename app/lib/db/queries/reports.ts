@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 
-import type { InsertTruckReport } from "../schema";
+import type { InsertRepair, InsertTruckReport } from "../schema";
 
 import db from "..";
 import { truckReports } from "../schema";
@@ -23,6 +23,7 @@ export async function findReport(reportId: number) {
     with: {
       user: true,
       assignedUser: true,
+      repairedUser: true,
       images: {
         orderBy(fields, operators) {
           return operators.desc(fields.createdAt);
@@ -59,6 +60,29 @@ export async function updateReportById(updates: InsertTruckReport, reportId: num
   return updated;
 }
 
+export async function markReportRepaired(repair: InsertRepair, reportId: number, repairedByUserId: number) {
+  const [updated] = await db.update(truckReports).set({
+    repairedByUserId,
+    repairedBy: repair.repairedBy,
+    repairedAt: repair.repairedAt,
+    repairCostCents: Math.round(repair.repairCost * 100),
+    ...(repair.ungroundTruck ? { isGrounded: false } : {}),
+  }).where(eq(truckReports.id, reportId)).returning();
+
+  return updated;
+}
+
+export async function removeReportRepair(reportId: number) {
+  const [updated] = await db.update(truckReports).set({
+    repairedByUserId: null,
+    repairedBy: null,
+    repairedAt: null,
+    repairCostCents: null,
+  }).where(eq(truckReports.id, reportId)).returning();
+
+  return updated;
+}
+
 export async function removeReportById(reportId: number, userId?: number) {
   const conditions = [
     eq(truckReports.id, reportId),
@@ -83,6 +107,26 @@ export async function findReportsByUserId(userId: number) {
     with: {
       user: true,
       assignedUser: true,
+      repairedUser: true,
+      images: {
+        orderBy(fields, operators) {
+          return operators.desc(fields.createdAt);
+        },
+      },
+    },
+  });
+}
+
+export async function findReportsAssignedToUserId(userId: number) {
+  return db.query.truckReports.findMany({
+    where: eq(truckReports.assignedTo, userId),
+    orderBy(fields, operators) {
+      return operators.desc(fields.createdAt);
+    },
+    with: {
+      user: true,
+      assignedUser: true,
+      repairedUser: true,
       images: {
         orderBy(fields, operators) {
           return operators.desc(fields.createdAt);
@@ -100,6 +144,7 @@ export async function findAllReports() {
     with: {
       user: true,
       assignedUser: true,
+      repairedUser: true,
       images: {
         orderBy(fields, operators) {
           return operators.desc(fields.createdAt);

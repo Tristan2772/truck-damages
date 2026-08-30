@@ -14,6 +14,8 @@ const props = defineProps<{
   reportedByName?: string | null;
   assignedToId?: number | null;
   assignedToName?: string | null;
+  repairedById?: number | null;
+  repairedByName?: string | null;
   isHovered?: boolean;
 }>();
 
@@ -61,11 +63,19 @@ const isManager = computed(() => isManagerEmail(authStore.user?.email));
 
         <NuxtLink
           v-if="isManager && props.assignedToId && props.assignedToName"
-          :to="{ name: 'damages-users-id', params: { id: props.assignedToId } }"
+          :to="{ name: 'damages-users-id', params: { id: props.assignedToId }, query: { mode: 'assigned' } }"
           class="text-sm text-gray-500 hover:underline"
         >
           <span>Assigned to: </span>
           <span> {{ props.assignedToName }}</span>
+        </NuxtLink>
+        <NuxtLink
+          v-if="isManager && props.repairedById && props.repairedByName"
+          :to="{ name: 'damages-trucks-vin-reports-id-repair', params: { vin: reportVin, id: props.reportId } }"
+          class="text-sm text-gray-500 hover:underline"
+        >
+          <span>Marked repaired by: </span>
+          <span> {{ props.repairedByName }}</span>
         </NuxtLink>
       </div>
       <NuxtLink

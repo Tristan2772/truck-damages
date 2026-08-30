@@ -10,7 +10,6 @@ import { isManagerUser } from "~/utils/permissions";
 
 export default defineAuthenticatedEventHandler(async (event) => {
   const isManager = isManagerUser(event.context.user);
-  const requestUserId = Number(event.context.user.id);
   const id = getRouterParam(event, "id") as string;
   const vin = getRouterParam(event, "vin") as string;
 
@@ -29,10 +28,10 @@ export default defineAuthenticatedEventHandler(async (event) => {
     });
   }
 
-  if (!isManager && report.userId !== requestUserId) {
+  if (!isManager) {
     return createError({
       statusCode: 403,
-      statusMessage: "Only managers and report owners can delete reports.",
+      statusMessage: "Only managers can delete reports.",
     });
   }
 

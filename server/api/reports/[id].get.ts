@@ -1,6 +1,6 @@
 import z from "zod";
 
-import { findReportsByUserId } from "~/lib/db/queries/reports";
+import { findReportsAssignedToUserId, findReportsByUserId } from "~/lib/db/queries/reports";
 import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-handler";
 import { isManagerEmail } from "~/utils/permissions";
 
@@ -22,5 +22,8 @@ export default defineAuthenticatedEventHandler(async (event) => {
     });
   }
 
-  return findReportsByUserId(parsedUserId.data);
+  const mode = z.enum(["created", "assigned"]).catch("created").parse(getQuery(event).mode);
+  return mode === "assigned"
+    ? findReportsAssignedToUserId(parsedUserId.data)
+    : findReportsByUserId(parsedUserId.data);
 });
