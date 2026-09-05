@@ -11,7 +11,7 @@ const props = defineProps<{
 
 <template>
   <div class="flex flex-col card p-3 border-2 border-solid bg-base-100 gap-4">
-    <div class="flex items-center gap-6 text-center">
+    <div class="flex flex-col items-start">
       <h3 class="text-xl">
         {{ name.toUpperCase() }}
       </h3>

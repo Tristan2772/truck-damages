@@ -14,6 +14,7 @@ export const trucks = sqliteTable("trucks", {
   name: text().notNull(),
   type: text().notNull(),
   userId: int().notNull().references(() => user.id),
+  archivedAt: int().notNull().default(0),
   createdAt: int().notNull().$default(() => Date.now()),
   updatedAt: int().notNull().$default(() => Date.now()).$onUpdate(() => Date.now()),
 }, t => [

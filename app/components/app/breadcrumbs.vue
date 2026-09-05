@@ -17,6 +17,18 @@ function isReportIdSegment(segment: string | undefined) {
 
 function getCrumbTarget(segments: string[], index: number, runningPath: string) {
   const segment = segments[index];
+  const repairsIndex = segments.indexOf("repairs");
+
+  if (repairsIndex >= 0 && index > repairsIndex) {
+    const trucksIndex = segments.indexOf("trucks");
+    const vin = trucksIndex >= 0 ? segments[trucksIndex + 1] : undefined;
+    const reportsIndex = segments.indexOf("reports");
+    const reportId = reportsIndex >= 0 ? segments[reportsIndex + 1] : undefined;
+
+    if (vin && reportId) {
+      return `/damages/trucks/${vin}/reports/${reportId}/repairs`;
+    }
+  }
 
   if (segment === "trucks") {
     const vin = segments[index + 1];
@@ -37,6 +49,17 @@ function getCrumbTarget(segments: string[], index: number, runningPath: string) 
 
     if (vin) {
       return `/damages/trucks/${vin}`;
+    }
+  }
+
+  if (segment === "repairs") {
+    const trucksIndex = segments.indexOf("trucks");
+    const vin = trucksIndex >= 0 ? segments[trucksIndex + 1] : undefined;
+    const reportsIndex = segments.indexOf("reports");
+    const reportId = reportsIndex >= 0 ? segments[reportsIndex + 1] : undefined;
+
+    if (vin && reportId) {
+      return `/damages/trucks/${vin}/reports/${reportId}/repairs`;
     }
   }
 

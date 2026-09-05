@@ -58,7 +58,7 @@ onBeforeMount(() => {
           />
           <AppTruckReport
             :report-id="report.report.id"
-            :vin="report.report.truckVin"
+            :vin="report.report.truck.vin"
             :name="report.report.name"
             :description="report.report.description"
             :started-at="report.report.createdAt"
@@ -67,21 +67,11 @@ onBeforeMount(() => {
             :reported-by-name="report.report.user.name"
             :assigned-to-id="report.report.assignedTo"
             :assigned-to-name="report.report.assignedUser?.name"
-            :repaired-by-id="report.report.repairedByUserId"
-            :repaired-by-name="report.report.repairedUser?.name"
-            class="zig-zag transition-all duration-300"
+            :repair-count="report.report.repairs.length"
+            class="transition-all duration-300"
           />
         </template>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.zig-zag {
-  --a: 90deg;
-  --s: 15px;
-  mask: conic-gradient(from calc(var(--a) / -2) at bottom, #000 0 var(--a), #0000 0);
-  mask-size: var(--s) 100%;
-}
-</style>

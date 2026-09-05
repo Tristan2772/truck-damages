@@ -9,6 +9,7 @@ export const user = sqliteTable("user", {
     .default(false)
     .notNull(),
   image: text(),
+  archivedAt: integer().notNull().default(0),
   createdAt: integer().notNull(),
   updatedAt: integer().notNull(),
 });

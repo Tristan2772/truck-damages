@@ -7,6 +7,7 @@ import { InsertTruckReportImage } from "~/lib/db/schema";
 import env from "~/lib/env";
 import createS3Client from "~/utils/create-s3-client";
 import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-handler";
+import ensureTruckIsActive from "~/utils/ensure-truck-is-active";
 import { isManagerUser } from "~/utils/permissions";
 import sendZodError from "~/utils/send-zod-error";
 
@@ -26,6 +27,7 @@ export default defineAuthenticatedEventHandler(async (event) => {
 
   const vin = getRouterParam(event, "vin") as string;
   const id = getRouterParam(event, "id") as string;
+  await ensureTruckIsActive(vin);
 
   if (!z.coerce.number().safeParse(id).success) {
     return createError({
@@ -33,8 +35,6 @@ export default defineAuthenticatedEventHandler(async (event) => {
       statusMessage: "Invalid Id.",
     });
   }
-
-  await event.$fetch(`/api/trucks/${vin}/${id}`);
 
   const report = await findReport(Number(id));
 

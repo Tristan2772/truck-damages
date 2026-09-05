@@ -2,12 +2,13 @@ import type { User } from "better-auth";
 
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { createAuthMiddleware } from "better-auth/api";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { emailOTP } from "better-auth/plugins";
 
 import db from "@/lib/db/index";
 
 import env from "../lib/env";
+import { findUserByEmail } from "./db/queries/users";
 
 export type userWithId = Omit<User, "id"> & {
   id: number;
@@ -31,6 +32,18 @@ const trustedOrigins = Array.from(new Set([
 
 export const auth = betterAuth({
   hooks: {
+    before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path !== "/sign-in/email" || typeof ctx.body?.email !== "string") {
+        return;
+      }
+
+      const user = await findUserByEmail(ctx.body.email);
+      if (user?.archivedAt) {
+        throw new APIError("FORBIDDEN", {
+          message: "This account has been archived.",
+        });
+      }
+    }),
     after: createAuthMiddleware(async (ctx) => {
       if (ctx.path === "/get-session") {
         if (!ctx.context.session) {
@@ -80,7 +93,7 @@ export const auth = betterAuth({
   plugins: [
     emailOTP({
       allowedAttempts: 5,
-      expiresIn: 300,
+      expiresIn: 900,
       overrideDefaultEmailVerification: true,
       sendVerificationOnSignUp: true,
       async sendVerificationOTP({ email, otp, type }) {
@@ -96,7 +109,7 @@ export const auth = betterAuth({
         const text = [
           `Your code is: ${otp}`,
           "",
-          "This code expires in 5 minutes.",
+          "This code expires in 15 minutes.",
           "If you did not request this code, you can ignore this email.",
         ].join("\n");
 

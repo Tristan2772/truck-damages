@@ -29,6 +29,34 @@
       "when": 1787936400000,
       "tag": "0003_add_repair_details_to_truck_reports",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788048000000,
+      "tag": "0004_add_archived_at_to_trucks",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1788048001000,
+      "tag": "0005_add_archived_at_to_users",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788480000000,
+      "tag": "0006_remove_truck_vin_from_truck_reports",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788566400000,
+      "tag": "0007_create_repairs",
+      "breakpoints": true
     }
   ]
 }

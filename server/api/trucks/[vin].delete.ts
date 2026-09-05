@@ -4,6 +4,7 @@ import env from "~/lib/env";
 import createS3Client from "~/utils/create-s3-client";
 import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-handler";
 import deleteS3Objects from "~/utils/delete-s3-objects";
+import ensureTruckIsActive from "~/utils/ensure-truck-is-active";
 import { isManagerUser } from "~/utils/permissions";
 
 export default defineAuthenticatedEventHandler(async (event) => {
@@ -15,6 +16,7 @@ export default defineAuthenticatedEventHandler(async (event) => {
   }
 
   const vin = getRouterParam(event, "vin") as string;
+  await ensureTruckIsActive(vin);
   const imageKeys = await findTruckReportImageKeysByTruckVin(vin);
 
   if (imageKeys.length) {

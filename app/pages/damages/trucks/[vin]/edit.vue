@@ -3,6 +3,7 @@ import type { InsertTruck } from "~/lib/db/schema";
 
 const trucksStore = useTrucksStore();
 const route = useRoute();
+const updatedVin = ref(route.params.vin?.toString() || "");
 
 const { $csrfFetch } = useNuxtApp() as any;
 
@@ -11,13 +12,14 @@ async function onSubmit(values: InsertTruck) {
     method: "put",
     body: values,
   });
+  updatedVin.value = values.vin;
 };
 
 function onSubmitComplete() {
   navigateTo({
     name: "damages-trucks-vin",
     params: {
-      vin: route.params.vin,
+      vin: updatedVin.value,
     },
   });
 }

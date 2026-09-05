@@ -1,4 +1,4 @@
-import { and, asc, eq, like, or } from "drizzle-orm";
+import { and, asc, eq, gt, like, or } from "drizzle-orm";
 
 import type { InsertTruck } from "../schema";
 
@@ -26,7 +26,7 @@ export async function findTruck(vin: string) {
         with: {
           user: true,
           assignedUser: true,
-          repairedUser: true,
+          repairs: true,
           images: {
             orderBy(fields, operators) {
               return operators.desc(fields.createdAt);
@@ -40,6 +40,7 @@ export async function findTruck(vin: string) {
 
 export async function findAllTrucks() {
   return db.query.trucks.findMany({
+    where: eq(trucks.archivedAt, 0),
     with: {
       truckReports: {
         orderBy(fields, operators) {
@@ -48,7 +49,30 @@ export async function findAllTrucks() {
         with: {
           user: true,
           assignedUser: true,
-          repairedUser: true,
+          repairs: true,
+          images: {
+            orderBy(fields, operators) {
+              return operators.desc(fields.createdAt);
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+export async function findAllArchivedTrucks() {
+  return db.query.trucks.findMany({
+    where: gt(trucks.archivedAt, 0),
+    with: {
+      truckReports: {
+        orderBy(fields, operators) {
+          return operators.desc(fields.createdAt);
+        },
+        with: {
+          user: true,
+          assignedUser: true,
+          repairs: true,
           images: {
             orderBy(fields, operators) {
               return operators.desc(fields.createdAt);
@@ -78,11 +102,14 @@ export async function searchHeaderMatches(searchTerm: string, limit = 8): Promis
   }).from(trucks).leftJoin(
     truckReports,
     eq(truckReports.truckId, trucks.id),
-  ).where(or(
-    like(trucks.vin, match),
-    like(trucks.name, match),
-    like(truckReports.name, match),
-    like(truckReports.description, match),
+  ).where(and(
+    eq(trucks.archivedAt, 0),
+    or(
+      like(trucks.vin, match),
+      like(trucks.name, match),
+      like(truckReports.name, match),
+      like(truckReports.description, match),
+    ),
   )).orderBy(
     asc(trucks.name),
     asc(truckReports.name),
@@ -164,6 +191,16 @@ export async function updateTruckByVin(updates: InsertTruck, vin: string, userId
 
   const [updated] = await db.update(trucks).set(updates).where(and(...conditions)).returning();
   return updated;
+}
+
+export async function archiveTruckByVin(vin: string) {
+  const [archived] = await db.update(trucks).set({ archivedAt: Date.now() }).where(eq(trucks.vin, vin)).returning();
+  return archived;
+}
+
+export async function restoreTruckByVin(vin: string) {
+  const [restored] = await db.update(trucks).set({ archivedAt: 0 }).where(eq(trucks.vin, vin)).returning();
+  return restored;
 }
 
 export async function removeTruckByVin(vin: string, userId?: number) {

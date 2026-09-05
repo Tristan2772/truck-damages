@@ -1,6 +1,7 @@
 import { findTruckByName, findTruckByVin, updateTruckByVin } from "~/lib/db/queries/trucks";
 import { InsertTruck } from "~/lib/db/schema";
 import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-handler";
+import ensureTruckIsActive from "~/utils/ensure-truck-is-active";
 import { isManagerUser } from "~/utils/permissions";
 import sendZodError from "~/utils/send-zod-error";
 
@@ -13,6 +14,7 @@ export default defineAuthenticatedEventHandler(async (event) => {
   }
 
   const vin = getRouterParam(event, "vin") as string;
+  await ensureTruckIsActive(vin);
   const result = await readValidatedBody(event, InsertTruck.safeParse);
 
   if (!result.success) {

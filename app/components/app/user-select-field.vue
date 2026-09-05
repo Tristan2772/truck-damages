@@ -17,7 +17,7 @@ const isOpen = ref(false);
 let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const selectedUser = ref<UserSearchResult | null>(props.initialUser || null);
-const selectedLabel = computed(() => selectedUser.value ? `${selectedUser.value.name} (${selectedUser.value.email})` : "");
+const selectedLabel = computed(() => selectedUser.value ? `${selectedUser.value.name} (${selectedUser.value.email})${selectedUser.value.archivedAt ? " - Archived" : ""}` : "");
 const showNoUsersFound = computed(() => searchTerm.value.trim().length >= 2 && !isSearching.value && users.value.length === 0);
 
 async function search() {
@@ -131,7 +131,7 @@ onBeforeUnmount(() => {
             @mousedown.prevent="selectUser(user)"
           >
             <span class="block">{{ user.name }}</span>
-            <span class="block text-sm opacity-70">{{ user.email }}</span>
+            <span class="block text-sm opacity-70">{{ user.email }}<span v-if="user.archivedAt"> - Archived</span></span>
           </button>
         </li>
       </ul>

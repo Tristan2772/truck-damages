@@ -14,8 +14,7 @@ const props = defineProps<{
   reportedByName?: string | null;
   assignedToId?: number | null;
   assignedToName?: string | null;
-  repairedById?: number | null;
-  repairedByName?: string | null;
+  repairCount?: number;
   isHovered?: boolean;
 }>();
 
@@ -27,7 +26,7 @@ const isManager = computed(() => isManagerEmail(authStore.user?.email));
 
 <template>
   <div
-    class="group card-body bg-base-100 text-left flex flex-col items-left p-2 pb-6 w-full transition-colors duration-200"
+    class="group card-body bg-base-100 text-left flex flex-col items-left p-2 w-full transition-colors duration-200"
   >
     <div>
       <p class="text-sm italic text-gray-500">
@@ -50,7 +49,7 @@ const isManager = computed(() => isManagerEmail(authStore.user?.email));
     <p v-else class="text-sm italic text-base-content/70 px-1">
       no images
     </p>
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-end">
       <div class="flex flex-col gap-2">
         <NuxtLink
           v-if="isManager && props.reportedById && props.reportedByName"
@@ -70,12 +69,11 @@ const isManager = computed(() => isManagerEmail(authStore.user?.email));
           <span> {{ props.assignedToName }}</span>
         </NuxtLink>
         <NuxtLink
-          v-if="isManager && props.repairedById && props.repairedByName"
-          :to="{ name: 'damages-trucks-vin-reports-id-repair', params: { vin: reportVin, id: props.reportId } }"
+          v-if="isManager && props.repairCount"
+          :to="{ name: 'damages-trucks-vin-reports-id-repairs', params: { vin: reportVin, id: props.reportId } }"
           class="text-sm text-gray-500 hover:underline"
         >
-          <span>Marked repaired by: </span>
-          <span> {{ props.repairedByName }}</span>
+          {{ props.repairCount }} repair{{ props.repairCount === 1 ? "" : "s" }} logged
         </NuxtLink>
       </div>
       <NuxtLink
