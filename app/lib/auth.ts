@@ -117,7 +117,7 @@ export const auth = betterAuth({
           to: email,
           subject,
           text,
-          html: `<p>Your code is: <strong>${otp}</strong></p><p>This code expires in 5 minutes.</p><p>If you did not request this code, you can ignore this email.</p>`,
+          html: `<p>Your code is: <strong>${otp}</strong></p><p>This code expires in 15 minutes.</p><p>If you did not request this code, you can ignore this email.</p>`,
         }).catch((error: unknown) => {
           console.error("Failed to send auth OTP email", error);
         });
