@@ -13,7 +13,7 @@ const isOpen = ref(false);
 const deletingRepairId = ref<number | null>(null);
 const deleteError = ref("");
 const openActionsMenuId = ref<number | null>(null);
-const actionsMenus = ref<HTMLElement[]>([]);
+const actionsMenus = new Map<number, HTMLElement>();
 
 const canManageReport = computed(() => {
   if (!report.value || !authStore.user || isTruckArchived.value) {
@@ -29,8 +29,9 @@ function closeActionsMenu() {
 
 function closeActionsMenuIfFocusLeaves(event: FocusEvent) {
   const relatedTarget = event.relatedTarget as Node | null;
+  const activeActionsMenu = openActionsMenuId.value === null ? null : actionsMenus.get(openActionsMenuId.value);
 
-  if (!relatedTarget || actionsMenus.value.some(menu => menu.contains(relatedTarget))) {
+  if (!relatedTarget || activeActionsMenu?.contains(relatedTarget)) {
     return;
   }
 
@@ -38,9 +39,26 @@ function closeActionsMenuIfFocusLeaves(event: FocusEvent) {
 }
 
 function closeActionsMenuIfOutside(event: PointerEvent) {
-  if (!actionsMenus.value.some(menu => menu.contains(event.target as Node))) {
+  const activeActionsMenu = openActionsMenuId.value === null ? null : actionsMenus.get(openActionsMenuId.value);
+
+  if (!(event.target instanceof Node) || !activeActionsMenu?.contains(event.target)) {
     closeActionsMenu();
   }
+}
+
+function setActionsMenu(repairId: number, element: unknown) {
+  const menuElement = element instanceof Element
+    ? element
+    : typeof element === "object" && element !== null && "$el" in element
+      ? element.$el
+      : null;
+
+  if (menuElement instanceof HTMLElement) {
+    actionsMenus.set(repairId, menuElement);
+    return;
+  }
+
+  actionsMenus.delete(repairId);
 }
 
 async function deleteRepair(repairId: number) {
@@ -152,7 +170,7 @@ onBeforeUnmount(() => {
           <div v-if="isManager && !isTruckArchived" class="flex gap-2">
             <div
               v-if="canManageReport"
-              ref="actionsMenus"
+              :ref="element => setActionsMenu(repair.id, element)"
               class="dropdown dropdown-bottom dropdown-end"
               :class="{ 'dropdown-open': openActionsMenuId === repair.id }"
               @focusout="closeActionsMenuIfFocusLeaves"
@@ -165,14 +183,6 @@ onBeforeUnmount(() => {
               >
                 <Icon name="tabler:dots-vertical" size="18" />
               </button>
-              <button
-                v-if="openActionsMenuId === repair.id"
-                tabindex="-1"
-                class="fixed inset-0 z-0 cursor-default"
-                type="button"
-                aria-label="Close menu"
-                @click="closeActionsMenu"
-              />
               <ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm mb-2 border-2 border-secondary">
                 <li v-if="canManageReport">
                   <NuxtLink

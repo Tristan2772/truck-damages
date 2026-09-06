@@ -40,7 +40,7 @@ function closeActionsMenuIfFocusLeaves(event: FocusEvent) {
 }
 
 function closeActionsMenuIfOutside(event: PointerEvent) {
-  if (!actionsMenu.value?.contains(event.target as Node)) {
+  if (!(event.target instanceof Node) || !actionsMenu.value?.contains(event.target)) {
     closeActionsMenu();
   }
 }
@@ -171,7 +171,7 @@ onBeforeRouteUpdate((to) => {
                 <button
                   v-if="isActionsMenuOpen"
                   tabindex="-1"
-                  class="fixed inset-0 z-0 cursor-default"
+                  class="fixed inset-0 z-10 cursor-default"
                   type="button"
                   aria-label="Close menu"
                   @click="closeActionsMenu"
