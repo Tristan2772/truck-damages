@@ -13,14 +13,12 @@ const props = defineProps<{
   onSubmitComplete: () => void;
 }>();
 
-const route = useRoute();
 const authStore = useAuthStore();
 const isManager = computed(() => isManagerUser(authStore.user));
 
 const defaultValues: InsertTruckReport = {
   name: "",
   description: "",
-  truckVin: route.params.vin?.toString() || "",
   isGrounded: false,
 };
 
@@ -50,15 +48,10 @@ const formInitialValues = computed(() => props.initialValues || defaultValues);
       :error="errors.description"
       :disabled="loading"
     />
-    <AppFormField
-      label="Truck Vin"
-      name="truckVin"
-      :error="errors.truckVin"
-      :disabled="loading"
-    />
     <AppCheckboxField
-      label="This damage grounds the vehicle"
+      label="Grounding"
       name="isGrounded"
+      label-description="This damage grounds the vehicle"
       :error="errors.isGrounded"
       :disabled="loading"
     />

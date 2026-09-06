@@ -1,6 +1,7 @@
 import type { userWithId } from "~/lib/auth";
 
 import { auth } from "~/lib/auth";
+import { findUserById } from "~/lib/db/queries/users";
 import { isManagerEmail } from "~/utils/permissions";
 
 export default defineEventHandler(async (event) => {
@@ -9,8 +10,11 @@ export default defineEventHandler(async (event) => {
   });
   event.context.user = session?.user as unknown as userWithId;
 
+  const user = session?.user ? await findUserById(Number(session.user.id)) : null;
+  const isArchived = Boolean(user?.archivedAt);
+
   if (event.path.startsWith("/damages")) {
-    if (!session?.user) {
+    if (!session?.user || isArchived) {
       await sendRedirect(event, "/", 302);
     }
   }

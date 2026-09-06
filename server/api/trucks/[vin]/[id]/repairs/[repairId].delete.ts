@@ -1,5 +1,6 @@
-import { findReport, removeReportRepair } from "~/lib/db/queries/reports";
+import { findRepairById, removeRepair } from "~/lib/db/queries/reports";
 import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-handler";
+import ensureTruckIsActive from "~/utils/ensure-truck-is-active";
 import { isManagerUser } from "~/utils/permissions";
 
 export default defineAuthenticatedEventHandler(async (event) => {
@@ -11,13 +12,16 @@ export default defineAuthenticatedEventHandler(async (event) => {
   }
 
   const reportId = Number(getRouterParam(event, "id"));
+  const repairId = Number(getRouterParam(event, "repairId"));
+  const vin = getRouterParam(event, "vin") as string;
+  await ensureTruckIsActive(vin);
 
-  if (!await findReport(reportId)) {
+  if (!await findRepairById(repairId, reportId)) {
     throw createError({
       statusCode: 404,
-      statusMessage: "Report not found",
+      statusMessage: "Repair not found",
     });
   }
 
-  return removeReportRepair(reportId);
+  return removeRepair(repairId, reportId);
 });

@@ -11,8 +11,9 @@ const { currentReport: report } = storeToRefs(truckStore);
 const authStore = useAuthStore();
 
 const isManager = computed(() => isManagerEmail(authStore.user?.email));
+const isTruckArchived = computed(() => Boolean(truckStore.currentTruck?.archivedAt));
 const canUploadImages = computed(() => {
-  if (!report.value || !authStore.user) {
+  if (!report.value || !authStore.user || isTruckArchived.value) {
     return false;
   }
 
@@ -20,7 +21,7 @@ const canUploadImages = computed(() => {
 });
 
 function canDeleteImage(image: SelectTruckReportImage) {
-  if (!authStore.user) {
+  if (!authStore.user || isTruckArchived.value) {
     return false;
   }
 
@@ -138,6 +139,9 @@ async function confirmDelete() {
     <h2 class="text-lg text-center">
       Manage "{{ report?.name }}" Images
     </h2>
+    <div v-if="isTruckArchived" class="alert alert-warning">
+      <span>Images are read-only because this truck is archived.</span>
+    </div>
     <div v-if="canUploadImages" class="flex flex-col gap-2 w-72 relative">
       <div class="bg-gray-500 h-30 w-full flex justify-center items-center p-2">
         <p v-if="!previewUrl" class="text-center text-white">

@@ -4,13 +4,16 @@ import { findReport, findReportByName, updateReportById } from "~/lib/db/queries
 import { findUserById } from "~/lib/db/queries/users";
 import { InsertTruckReport } from "~/lib/db/schema";
 import defineAuthenticatedEventHandler from "~/utils/define-authenticated-event-handler";
+import ensureTruckIsActive from "~/utils/ensure-truck-is-active";
 import { isManagerUser } from "~/utils/permissions";
 import sendZodError from "~/utils/send-zod-error";
 
 export default defineAuthenticatedEventHandler(async (event) => {
   const isManager = isManagerUser(event.context.user);
   const requestUserId = Number(event.context.user.id);
+  const vin = getRouterParam(event, "vin") as string;
   const reportId = Number(getRouterParam(event, "id"));
+  await ensureTruckIsActive(vin);
   const result = await readValidatedBody(event, InsertTruckReport.safeParse);
 
   if (!result.success) {
@@ -32,10 +35,10 @@ export default defineAuthenticatedEventHandler(async (event) => {
     });
   }
 
-  if (report.repairedAt) {
+  if (!isManager && report.repairs.length > 0) {
     return createError({
       statusCode: 409,
-      statusMessage: "Repaired reports cannot be edited.",
+      statusMessage: "Only managers can edit repaired reports.",
     });
   }
 
@@ -48,7 +51,6 @@ export default defineAuthenticatedEventHandler(async (event) => {
 
   const unassignedReport: InsertTruckReportInput = {
     name: result.data.name,
-    truckVin: result.data.truckVin,
     description: result.data.description,
     isGrounded: result.data.isGrounded,
   };

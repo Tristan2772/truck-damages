@@ -6,9 +6,11 @@ import { getReportRecency } from "~/utils/report-recency";
 
 const truckStore = useTrucksStore();
 const authStore = useAuthStore();
+const { $csrfFetch } = useNuxtApp();
 const { currentTruck: truck, currentTruckError: error, currentTruckStatus: status } = storeToRefs(truckStore);
 const route = useRoute();
 const isOpen = ref(false);
+const isArchiveDialogOpen = ref(false);
 const isActionsMenuOpen = ref(false);
 const actionsMenu = ref<HTMLElement | null>(null);
 const isManager = computed(() => isManagerEmail(authStore.user?.email));
@@ -49,8 +51,16 @@ function openDialog() {
   (document.activeElement as HTMLAnchorElement).blur();
 }
 
+function openArchiveDialog() {
+  closeActionsMenu();
+  isArchiveDialogOpen.value = true;
+  (document.activeElement as HTMLAnchorElement).blur();
+}
+
 const isDeleting = ref(false);
-const loading = computed(() => status.value === "pending" || isDeleting.value);
+const isArchiving = ref(false);
+const isRestoring = ref(false);
+const loading = computed(() => status.value === "pending" || isDeleting.value || isArchiving.value || isRestoring.value);
 const deleteError = ref("");
 const errorMessage = computed(() => error.value?.statusMessage || deleteError.value);
 
@@ -59,7 +69,7 @@ async function confirmDelete() {
     isOpen.value = false;
     deleteError.value = "";
     isDeleting.value = true;
-    await $fetch(`/api/trucks/${route.params.vin}`, {
+    await $csrfFetch(`/api/trucks/${route.params.vin}`, {
       method: "DELETE",
     });
     navigateTo("/damages");
@@ -69,6 +79,35 @@ async function confirmDelete() {
     deleteError.value = error.data?.statusMessage || error.statusMessage || "An unknown error occurred";
   }
   isDeleting.value = false;
+}
+
+async function confirmArchive() {
+  try {
+    isArchiveDialogOpen.value = false;
+    deleteError.value = "";
+    isArchiving.value = true;
+    await $csrfFetch(`/api/trucks/${route.params.vin}/archive`, { method: "POST" });
+    await truckStore.currentTruckRefresh();
+  }
+  catch (e) {
+    const error = e as FetchError;
+    deleteError.value = error.data?.statusMessage || error.statusMessage || "An unknown error occurred";
+  }
+  isArchiving.value = false;
+}
+
+async function restoreTruck() {
+  try {
+    deleteError.value = "";
+    isRestoring.value = true;
+    await $csrfFetch(`/api/trucks/${route.params.vin}/restore`, { method: "POST" });
+    await truckStore.currentTruckRefresh();
+  }
+  catch (e) {
+    const error = e as FetchError;
+    deleteError.value = error.data?.statusMessage || error.statusMessage || "An unknown error occurred";
+  }
+  isRestoring.value = false;
 }
 
 onMounted(() => {
@@ -111,13 +150,13 @@ onBeforeRouteUpdate((to) => {
     <div v-if="route.name === 'damages-trucks-vin' && truck && !loading">
       <div class="flex flex-col">
         <div class="flex flex-col gap-2 items-center text-left">
-          <div class="w-full flex flex-col gap-2 justify-center items-center pt-5">
+          <div class="w-full flex flex-col gap-2 justify-center items-start pt-5 px-4">
             <h2 class="text-2xl flex items-center gap-2 text-balance">
               <span>{{ truck.name }}</span>
               <div
                 v-if="isManager"
                 ref="actionsMenu"
-                class="dropdown dropdown-bottom dropdown-end"
+                class="dropdown dropdown-bottom dropdown-start"
                 :class="{ 'dropdown-open': isActionsMenuOpen }"
                 @focusout="closeActionsMenuIfFocusLeaves"
               >
@@ -138,7 +177,7 @@ onBeforeRouteUpdate((to) => {
                   @click="closeActionsMenu"
                 />
                 <ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm mb-2  border-2 border-secondary">
-                  <li>
+                  <li v-if="!truck.archivedAt">
                     <NuxtLink
                       :to="{
                         name: 'damages-trucks-vin-edit',
@@ -152,19 +191,32 @@ onBeforeRouteUpdate((to) => {
                       Edit
                     </NuxtLink>
                   </li>
-                  <li>
+                  <li v-if="!truck.archivedAt">
+                    <NuxtLink to="" @click="openArchiveDialog">
+                      <Icon name="tabler:archive" size="24" />
+                      Archive
+                    </NuxtLink>
+                  </li>
+                  <li v-if="!truck.archivedAt">
                     <NuxtLink to="" @click="openDialog">
                       <Icon name="tabler:trash-x-filled" size="24" />
                       Delete
+                    </NuxtLink>
+                  </li>
+                  <li v-if="truck.archivedAt">
+                    <NuxtLink to="" @click="restoreTruck">
+                      <Icon name="tabler:restore" size="24" />
+                      Restore
                     </NuxtLink>
                   </li>
                 </ul>
               </div>
             </h2>
             <p
-              class="text-sm mb-4 p-2 pb-0 text-pretty"
+              class="text-sm mb-4 py-2 pb-0 text-pretty"
             >
               {{ truck.vin }}
+              <span v-if="truck.archivedAt" class="badge badge-warning ml-4">Archived</span>
             </p>
           </div>
         </div>
@@ -186,14 +238,13 @@ onBeforeRouteUpdate((to) => {
                 :reported-by-name="report.report.user.name"
                 :assigned-to-id="report.report.assignedTo"
                 :assigned-to-name="report.report.assignedUser?.name"
-                :repaired-by-id="report.report.repairedByUserId"
-                :repaired-by-name="report.report.repairedUser?.name"
-                class="zig-zag transition-all duration-300"
+                :repair-count="report.report.repairs.length"
+                class="transition-all duration-300"
               />
             </template>
           </div>
 
-          <div class="bg-base-100">
+          <div v-if="!truck.archivedAt" class="bg-base-100">
             <div class="card-body text-center flex flex-col items-center justify-center gap-4">
               <p class="text-lg max-h-fit">
                 Add a new damage report. Add images to the report to visually document the damage.
@@ -219,14 +270,14 @@ onBeforeRouteUpdate((to) => {
       @on-closed="isOpen = false"
       @on-confirmed="confirmDelete"
     />
+    <AppDialog
+      :is-open="isArchiveDialogOpen"
+      title="Archive this truck?"
+      description="The truck and all of its reports will remain available as read-only records until restored."
+      confirm-class="btn-primary"
+      confirm-label="Archive Truck"
+      @on-closed="isArchiveDialogOpen = false"
+      @on-confirmed="confirmArchive"
+    />
   </div>
 </template>
-
-<style scoped>
-.zig-zag {
-  --a: 90deg;
-  --s: 15px;
-  mask: conic-gradient(from calc(var(--a) / -2) at bottom, #000 0 var(--a), #0000 0);
-  mask-size: var(--s) 100%;
-}
-</style>

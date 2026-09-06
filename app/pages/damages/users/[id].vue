@@ -1,15 +1,29 @@
 <script lang="ts" setup>
+import type { FetchError } from "ofetch";
+
 import type { SelectUser } from "~/lib/db/schema";
 
+import { isManagerEmail } from "~/utils/permissions";
 import { getReportRecency } from "~/utils/report-recency";
 
-const route = useRoute();
-const userId = computed(() => String(route.params.id));
-const selectedMode = ref(route.query.mode === "assigned" ? "assigned" : "created");
-const showAssigned = computed(() => selectedMode.value === "assigned");
-const mode = computed(() => showAssigned.value ? "assigned" : "created");
+const { $csrfFetch } = useNuxtApp();
 
-const { data: user } = await useFetch<SelectUser>(
+const route = useRoute();
+const router = useRouter();
+const authStore = useAuthStore();
+const userId = computed(() => String(route.params.id));
+const mode = computed(() => route.query.mode === "assigned" ? "assigned" : "created");
+const showAssigned = computed({
+  get: () => mode.value === "assigned",
+  set: showAssigned => router.replace({
+    query: {
+      ...route.query,
+      mode: showAssigned ? "assigned" : "created",
+    },
+  }),
+});
+
+const { data: user, refresh: refreshUser } = await useFetch<SelectUser>(
   () => `/api/users/${userId.value}`,
 );
 
@@ -21,17 +35,21 @@ const { data: reports, error, status } = await useFetch(
 );
 
 const loading = computed(() => status.value === "pending");
-const errorMessage = computed(() => error.value?.statusMessage || "");
+const isManager = computed(() => isManagerEmail(authStore.user?.email));
+const isArchiveDialogOpen = ref(false);
+const isSaving = ref(false);
+const archiveError = ref("");
+const errorMessage = computed(() => error.value?.statusMessage || archiveError.value);
 const userName = computed(() => user.value?.name || "User");
 const formattedTotalDamagesCost = computed(() => {
   if (!showAssigned.value) {
     return null;
   }
 
-  const totalCents = reports.value.reduce(
-    (total, report) => total + (report.repairCostCents || 0),
+  const totalCents = reports.value.reduce((total, report) => total + report.repairs.reduce(
+    (repairTotal, repair) => repairTotal + repair.repairCostCents,
     0,
-  );
+  ), 0);
 
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -49,34 +67,152 @@ const reportsWithRecency = computed(() => reports.value.map((report, index, allR
   };
 }));
 
-function updateMode(event: Event) {
-  selectedMode.value = (event.target as HTMLInputElement).checked ? "assigned" : "created";
-
-  navigateTo({
-    query: { ...route.query, mode: selectedMode.value },
-  });
+async function archiveUser() {
+  try {
+    isArchiveDialogOpen.value = false;
+    archiveError.value = "";
+    isSaving.value = true;
+    await $csrfFetch(`/api/users/${userId.value}/archive`, { method: "POST" });
+  }
+  catch (error) {
+    const fetchError = error as FetchError;
+    archiveError.value = fetchError.data?.statusMessage || fetchError.statusMessage || "An unknown error occurred";
+  }
+  isSaving.value = false;
 }
 
-watch(() => route.query.mode, () => {
-  selectedMode.value = route.query.mode === "assigned" ? "assigned" : "created";
+async function restoreUser() {
+  try {
+    archiveError.value = "";
+    isSaving.value = true;
+    await $csrfFetch(`/api/users/${userId.value}/restore`, { method: "POST" });
+    await refreshUser();
+  }
+  catch (error) {
+    const fetchError = error as FetchError;
+    archiveError.value = fetchError.data?.statusMessage || fetchError.statusMessage || "An unknown error occurred";
+  }
+  isSaving.value = false;
+}
+
+const isActionsMenuOpen = ref(false);
+const actionsMenu = ref<HTMLElement | null>(null);
+const actionsMenuButton = ref<HTMLElement | null>(null);
+const hasSpaceForStartDropdown = ref(true);
+
+const dropdownPositionClass = computed(() => hasSpaceForStartDropdown.value ? "dropdown-start" : "dropdown-end");
+
+function closeActionsMenu() {
+  isActionsMenuOpen.value = false;
+}
+
+function closeActionsMenuIfFocusLeaves(event: FocusEvent) {
+  const relatedTarget = event.relatedTarget as Node | null;
+
+  if (!relatedTarget || actionsMenu.value?.contains(relatedTarget)) {
+    return;
+  }
+
+  closeActionsMenu();
+}
+
+function closeActionsMenuIfOutside(event: PointerEvent) {
+  if (!actionsMenu.value?.contains(event.target as Node)) {
+    closeActionsMenu();
+  }
+}
+
+function updateDropdownPosition() {
+  if (!actionsMenuButton.value) {
+    return;
+  }
+
+  const dropdownWidth = 208;
+  const buttonBounds = actionsMenuButton.value.getBoundingClientRect();
+  hasSpaceForStartDropdown.value = window.innerWidth - buttonBounds.left >= dropdownWidth;
+}
+
+onMounted(() => {
+  document.addEventListener("pointerdown", closeActionsMenuIfOutside);
+  window.addEventListener("resize", updateDropdownPosition);
+  updateDropdownPosition();
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("pointerdown", closeActionsMenuIfOutside);
+  window.removeEventListener("resize", updateDropdownPosition);
 });
 </script>
 
 <template>
   <div class="w-full p-4">
     <div class="flex flex-col gap-4">
-      <h1 class="text-2xl font-bold">
-        {{ userName }}'s {{ showAssigned ? "Damages" : "Reports" }}
-      </h1>
-      <div class="flex justify-between">
-        <label class="label cursor-pointer justify-start gap-2">
-          <input
-            type="checkbox"
-            class="checkbox checkbox-sm"
-            :checked="showAssigned"
-            @change="updateMode"
+      <div class="flex items-center justify-between gap-2">
+        <h2 class="text-xl flex">
+          <span class="w-full">{{ userName }}</span>
+          <div
+            v-if="isManager"
+            ref="actionsMenu"
+            class="dropdown dropdown-bottom"
+            :class="[{ 'dropdown-open': isActionsMenuOpen }, dropdownPositionClass]"
+            @focusout="closeActionsMenuIfFocusLeaves"
           >
-          <span class="label-text">Damages</span>
+            <button
+              ref="actionsMenuButton"
+              tabindex="0"
+              class="btn btn-sm btn-ghost hover:bg-base-100 p-2"
+              type="button"
+              @click="isActionsMenuOpen = !isActionsMenuOpen"
+            >
+              <Icon name="tabler:dots-vertical" size="18" />
+            </button>
+            <button
+              v-if="isActionsMenuOpen"
+              tabindex="-1"
+              class="fixed inset-0 z-0 cursor-default"
+              type="button"
+              aria-label="Close menu"
+              @click="closeActionsMenu"
+            />
+            <ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm mb-2 border-2 border-secondary">
+              <li v-if="isManager && !user?.archivedAt">
+                <button
+                  class="btn btn-sm btn-ghost"
+                  type="button"
+                  :disabled="isSaving"
+                  @click="isArchiveDialogOpen = true"
+                >
+                  <Icon name="tabler:archive" size="18" />
+                  Archive
+                </button>
+              </li>
+              <li v-if="isManager && user?.archivedAt">
+                <button
+                  class="btn btn-sm btn-ghost"
+                  type="button"
+                  :disabled="isSaving"
+                  @click="restoreUser"
+                >
+                  <Icon name="tabler:restore" size="18" />
+                  Restore
+                </button>
+              </li>
+            </ul>
+          </div>
+        </h2>
+        <div v-if="user?.archivedAt" class="badge badge-warning">
+          Archived
+        </div>
+      </div>
+      <div class="flex justify-between">
+        <label class="label cursor-pointer justify-self-end gap-2">
+          <input
+            v-model="showAssigned"
+            type="checkbox"
+            class="toggle toggle-error"
+          >
+          <span v-if="!showAssigned" class="label-text pr-3">Reports</span>
+          <span v-if="showAssigned" class="label-text">Damages</span>
         </label>
         <div v-if="showAssigned">
           {{ formattedTotalDamagesCost }}
@@ -111,7 +247,7 @@ watch(() => route.query.mode, () => {
           />
           <AppTruckReport
             :report-id="report.report.id"
-            :vin="report.report.truckVin"
+            :vin="report.report.truck.vin"
             :name="report.report.name"
             :description="report.report.description"
             :started-at="report.report.createdAt"
@@ -120,21 +256,20 @@ watch(() => route.query.mode, () => {
             :reported-by-name="report.report.user.name"
             :assigned-to-id="report.report.assignedTo"
             :assigned-to-name="report.report.assignedUser?.name"
-            :repaired-by-id="report.report.repairedByUserId"
-            :repaired-by-name="report.report.repairedUser?.name"
-            class="zig-zag transition-all duration-300"
+            :repair-count="report.report.repairs.length"
+            class="transition-all duration-300"
           />
         </template>
       </div>
     </div>
+    <AppDialog
+      :is-open="isArchiveDialogOpen"
+      title="Archive this user?"
+      description="The user will no longer be able to sign in. Their reports and repair costs will be retained."
+      confirm-class="btn-primary"
+      confirm-label="Archive User"
+      @on-closed="isArchiveDialogOpen = false"
+      @on-confirmed="archiveUser"
+    />
   </div>
 </template>
-
-<style scoped>
-.zig-zag {
-  --a: 90deg;
-  --s: 15px;
-  mask: conic-gradient(from calc(var(--a) / -2) at bottom, #000 0 var(--a), #0000 0);
-  mask-size: var(--s) 100%;
-}
-</style>

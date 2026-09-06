@@ -4,9 +4,12 @@ import { createInsertSchema } from "drizzle-zod";
 import z from "zod";
 
 import type { SelectUser } from "./auth";
+import type { SelectRepair } from "./repairs";
 import type { SelectTruckReportImage } from "./truck-report-images";
+import type { SelectTruck } from "./trucks";
 
 import { user } from "./auth";
+import { repairs } from "./repairs";
 import { truckReportImages } from "./truck-report-images";
 import { trucks } from "./trucks";
 
@@ -15,22 +18,16 @@ export const truckReports = sqliteTable("truckReports", {
   name: text().notNull(),
   description: text(),
   truckId: int().notNull().references(() => trucks.id, { onDelete: "cascade" }),
-  truckVin: text().notNull(),
   userId: int().notNull().references(() => user.id),
   createdAt: int().notNull().$default(() => Date.now()),
   updatedAt: int().notNull().$default(() => Date.now()).$onUpdate(() => Date.now()),
   isGrounded: int({ mode: "boolean" }).notNull().default(false),
   assignedTo: int(),
-  repairedByUserId: int().references(() => user.id),
-  repairedBy: text(),
-  repairedAt: int(),
-  repairCostCents: int(),
 });
 
 export const InsertTruckReport = createInsertSchema(truckReports, {
   name: z.string().min(1).max(100),
   description: z.string().max(1000).optional().nullable(),
-  truckVin: z.string().min(17).max(17),
   assignedTo: z.number().int().positive().nullable().optional(),
 }).omit({
   id: true,
@@ -53,18 +50,16 @@ export const TruckReportsRelations = relations(truckReports, ({ one, many }) => 
     fields: [truckReports.assignedTo],
     references: [user.id],
   }),
-  repairedUser: one(user, {
-    fields: [truckReports.repairedByUserId],
-    references: [user.id],
-  }),
   images: many(truckReportImages),
+  repairs: many(repairs),
 }));
 
 export type SelectTruckReport = typeof truckReports.$inferSelect;
 export type InsertTruckReport = z.infer<typeof InsertTruckReport>;
 export type SelectTruckReportWithImages = SelectTruckReport & {
+  truck: SelectTruck;
   images: SelectTruckReportImage[];
   user: SelectUser;
   assignedUser: SelectUser | null;
-  repairedUser: SelectUser | null;
+  repairs: SelectRepair[];
 };

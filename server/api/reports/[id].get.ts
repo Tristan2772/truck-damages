@@ -25,5 +25,5 @@ export default defineAuthenticatedEventHandler(async (event) => {
   const mode = z.enum(["created", "assigned"]).catch("created").parse(getQuery(event).mode);
   return mode === "assigned"
     ? findReportsAssignedToUserId(parsedUserId.data)
-    : findReportsByUserId(parsedUserId.data);
+    : findReportsByUserId(parsedUserId.data, true);
 });

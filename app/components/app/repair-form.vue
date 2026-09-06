@@ -22,6 +22,7 @@ const props = defineProps<{
       repairedBy: '',
       repairedAt: new Date().setHours(0, 0, 0, 0),
       repairCost: 0,
+      description: '',
       ungroundTruck: false,
     }"
     :on-submit
@@ -65,9 +66,17 @@ const props = defineProps<{
     </fieldset>
     <AppCheckboxField
       v-if="props.canUngroundTruck"
-      label="Does this repair unground the truck?"
+      label-description="Does this repair unground the truck?"
+      label="Grounding"
       name="ungroundTruck"
       :error="errors.ungroundTruck"
+      :disabled="loading"
+    />
+    <AppFormField
+      label="Description"
+      name="description"
+      type="textarea"
+      :error="errors.description"
       :disabled="loading"
     />
   </AppTruckBaseForm>
