@@ -88,7 +88,7 @@ async function confirmDelete() {
 }
 
 onMounted(() => {
-  document.addEventListener("pointerdown", closeActionsMenuIfOutside);
+  document.addEventListener("pointerdown", closeActionsMenuIfOutside, true);
   window.addEventListener("resize", updateDropdownPosition);
   updateDropdownPosition();
   setTimeout(() => {
@@ -97,7 +97,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  document.removeEventListener("pointerdown", closeActionsMenuIfOutside);
+  document.removeEventListener("pointerdown", closeActionsMenuIfOutside, true);
   window.removeEventListener("resize", updateDropdownPosition);
 });
 

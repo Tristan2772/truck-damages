@@ -101,11 +101,11 @@ async function confirmDelete() {
 }
 
 onMounted(() => {
-  document.addEventListener("pointerdown", closeActionsMenuIfOutside);
+  document.addEventListener("pointerdown", closeActionsMenuIfOutside, true);
 });
 
 onBeforeUnmount(() => {
-  document.removeEventListener("pointerdown", closeActionsMenuIfOutside);
+  document.removeEventListener("pointerdown", closeActionsMenuIfOutside, true);
 });
 </script>
 
