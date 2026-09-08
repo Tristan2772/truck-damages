@@ -44,7 +44,7 @@ function closeActionsMenuIfFocusLeaves(event: FocusEvent) {
 }
 
 function closeActionsMenuIfOutside(event: PointerEvent) {
-  if (!(event.target instanceof Node) || !actionsMenu.value?.contains(event.target)) {
+  if (!actionsMenu.value?.contains(event.target as Node)) {
     closeActionsMenu();
   }
 }
@@ -134,8 +134,10 @@ onBeforeRouteUpdate((to) => {
                 Archived Truck
               </p>
             </div>
-            <h2 class="text-xl flex">
-              <span class="w-full">{{ report.name }}</span>
+            <div class="flex">
+              <h2 class="text-xl">
+                <span class="w-full">{{ report.name }}</span>
+              </h2>
               <div
                 v-if="canManageReport"
                 ref="actionsMenu"
@@ -152,6 +154,14 @@ onBeforeRouteUpdate((to) => {
                 >
                   <Icon name="tabler:dots-vertical" size="18" />
                 </button>
+                <button
+                  v-if="isActionsMenuOpen"
+                  tabindex="-1"
+                  class="fixed inset-0 z-0 cursor-default"
+                  type="button"
+                  aria-label="Close menu"
+                  @click="closeActionsMenu"
+                />
                 <ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm mb-2 border-2 border-secondary">
                   <li v-if="canManageReport">
                     <NuxtLink
@@ -192,7 +202,7 @@ onBeforeRouteUpdate((to) => {
                   </li>
                 </ul>
               </div>
-            </h2>
+            </div>
             <p
               class="text-sm mb-4 pb-0 text-pretty"
             >
