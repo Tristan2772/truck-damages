@@ -8,8 +8,8 @@ const truckStore = useTrucksStore();
 const authStore = useAuthStore();
 const { currentReport: report, currentReportError: error, currentReportStatus: status } = storeToRefs(truckStore);
 const isOpen = ref(false);
-const isActionsMenuOpen = ref(false);
 const actionsMenu = ref<HTMLElement | null>(null);
+const isActionsMenuOpen = ref(false);
 const actionsMenuButton = ref<HTMLElement | null>(null);
 const hasSpaceForStartDropdown = ref(true);
 const isDeleting = ref(false);
@@ -88,8 +88,8 @@ async function confirmDelete() {
 }
 
 onMounted(() => {
-  document.addEventListener("pointerdown", closeActionsMenuIfOutside, true);
   window.addEventListener("resize", updateDropdownPosition);
+  document.addEventListener("pointerdown", closeActionsMenuIfOutside);
   updateDropdownPosition();
   setTimeout(() => {
     truckStore.currentReportRefresh();
@@ -97,7 +97,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  document.removeEventListener("pointerdown", closeActionsMenuIfOutside, true);
+  document.removeEventListener("pointerdown", closeActionsMenuIfOutside);
   window.removeEventListener("resize", updateDropdownPosition);
 });
 
@@ -122,7 +122,7 @@ onBeforeRouteUpdate((to) => {
     <div v-if="route.name === 'damages-trucks-vin-reports-id' && report && !loading">
       <div class="flex flex-col">
         <div class="w-full flex flex-col gap-2 items-start z-10 pl-4">
-          <div class="flex flex-col flex-1 gap-2 justify-start items-start pt-5">
+          <div class="flex flex-col flex-1 gap-2 justify-start items-start pt-5 relative">
             <div class="flex gap-4 text-sm italic text-gray-500">
               <p>{{ report.truck.vin }}</p>
               <p>
@@ -138,69 +138,72 @@ onBeforeRouteUpdate((to) => {
               <h2 class="text-xl">
                 <span class="w-full">{{ report.name }}</span>
               </h2>
-              <div
-                v-if="canManageReport"
-                ref="actionsMenu"
-                class="dropdown dropdown-bottom"
-                :class="[{ 'dropdown-open': isActionsMenuOpen }, dropdownPositionClass]"
-                @focusout="closeActionsMenuIfFocusLeaves"
-              >
-                <button
-                  ref="actionsMenuButton"
-                  tabindex="0"
-                  class="btn btn-sm btn-ghost hover:bg-base-100 p-2"
-                  type="button"
-                  @click="isActionsMenuOpen = !isActionsMenuOpen"
+              <div class="flex">
+                <div
+                  ref="actionsMenu"
+                  class="dropdown dropdown-bottom"
+                  :class="[{ 'dropdown-open': isActionsMenuOpen, 'dropdown-close': !isActionsMenuOpen }, dropdownPositionClass]"
+                  @focusout="closeActionsMenuIfFocusLeaves"
                 >
-                  <Icon name="tabler:dots-vertical" size="18" />
-                </button>
-                <button
-                  v-if="isActionsMenuOpen"
-                  tabindex="-1"
-                  class="fixed inset-0 z-0 cursor-default"
-                  type="button"
-                  aria-label="Close menu"
-                  @click="closeActionsMenu"
-                />
-                <ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm mb-2 border-2 border-secondary">
-                  <li v-if="canManageReport">
-                    <NuxtLink
-
-                      :to="{
-                        name: 'damages-trucks-vin-reports-id-edit',
-                        params: {
-                          vin: route.params.vin,
-                          id: report.id,
-                        },
-                      }"
-                      @click="closeActionsMenu"
-                    >
-                      <AppReportSettingsIcon />
-                      Edit
-                    </NuxtLink>
-                  </li>
-                  <li v-if="isManager">
-                    <NuxtLink
-                      :to="{
-                        name: 'damages-trucks-vin-reports-id-repairs-add',
-                        params: {
-                          vin: route.params.vin,
-                          id: report.id,
-                        },
-                      }"
-                      @click="closeActionsMenu"
-                    >
-                      <AppWrenchIcon />
-                      Add Repair
-                    </NuxtLink>
-                  </li>
-                  <li v-if="canManageReport">
-                    <NuxtLink to="" @click="openDialog">
-                      <Icon name="tabler:trash-x-filled" size="24" />
-                      Delete
-                    </NuxtLink>
-                  </li>
-                </ul>
+                  <button
+                    tabindex="0"
+                    class="btn btn-sm btn-ghost hover:bg-base-100 p-2"
+                    type="button"
+                    @click="isActionsMenuOpen = !isActionsMenuOpen"
+                  >
+                    <Icon name="tabler:dots-vertical" size="18" />
+                  </button>
+                  <button
+                    v-if="isActionsMenuOpen"
+                    tabindex="-1"
+                    class="fixed inset-0 z-20 cursor-default bg-black/35"
+                    type="button"
+                    aria-label="Close menu"
+                    @click.capture="closeActionsMenu"
+                  />
+                  <div
+                    v-if="isActionsMenuOpen"
+                    tabindex="-1"
+                    class="dropdown-content menu bg-base-100 rounded-box z-100 mb-2 w-52 shadow-sm border-2 border-secondary"
+                  >
+                    <ul>
+                      <li v-if="canManageReport">
+                        <NuxtLink
+                          :to="{
+                            name: 'damages-trucks-vin-reports-id-edit',
+                            params: {
+                              vin: route.params.vin,
+                              id: report.id,
+                            },
+                          }"
+                        >
+                          <AppReportSettingsIcon />
+                          Edit
+                        </NuxtLink>
+                      </li>
+                      <li v-if="isManager">
+                        <NuxtLink
+                          :to="{
+                            name: 'damages-trucks-vin-reports-id-repairs-add',
+                            params: {
+                              vin: route.params.vin,
+                              id: report.id,
+                            },
+                          }"
+                        >
+                          <AppWrenchIcon />
+                          Add Repair
+                        </NuxtLink>
+                      </li>
+                      <li v-if="canManageReport">
+                        <NuxtLink to="" @click="openDialog">
+                          <Icon name="tabler:trash-x-filled" size="24" />
+                          Delete
+                        </NuxtLink>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
             <p

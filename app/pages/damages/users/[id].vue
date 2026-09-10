@@ -147,51 +147,67 @@ onBeforeUnmount(() => {
 <template>
   <div class="w-full p-4">
     <div class="flex flex-col gap-4">
-      <div class="flex items-center justify-between gap-2">
-        <h2 class="text-xl flex">
-          <span class="w-full">{{ userName }}</span>
-          <div
-            v-if="isManager"
-            ref="actionsMenu"
-            class="dropdown dropdown-bottom"
-            :class="[{ 'dropdown-open': isActionsMenuOpen }, dropdownPositionClass]"
-            @focusout="closeActionsMenuIfFocusLeaves"
-          >
-            <button
-              ref="actionsMenuButton"
-              tabindex="0"
-              class="btn btn-sm btn-ghost hover:bg-base-100 p-2"
-              type="button"
-              @click="isActionsMenuOpen = !isActionsMenuOpen"
+      <div class="flex items-center justify-between gap-2 relative">
+        <div class="flex items-center">
+          <h2 class="text-xl">
+            <span class="w-full">{{ userName }}</span>
+          </h2>
+          <div class="flex">
+            <div
+              ref="actionsMenu"
+              class="dropdown dropdown-bottom"
+              :class="[{ 'dropdown-open': isActionsMenuOpen, 'dropdown-close': !isActionsMenuOpen }, dropdownPositionClass]"
+              @focusout="closeActionsMenuIfFocusLeaves"
             >
-              <Icon name="tabler:dots-vertical" size="18" />
-            </button>
-            <ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm mb-2 border-2 border-secondary">
-              <li v-if="isManager && !user?.archivedAt">
-                <button
-                  class="btn btn-sm btn-ghost"
-                  type="button"
-                  :disabled="isSaving"
-                  @click="isArchiveDialogOpen = true"
-                >
-                  <Icon name="tabler:archive" size="18" />
-                  Archive
-                </button>
-              </li>
-              <li v-if="isManager && user?.archivedAt">
-                <button
-                  class="btn btn-sm btn-ghost"
-                  type="button"
-                  :disabled="isSaving"
-                  @click="restoreUser"
-                >
-                  <Icon name="tabler:restore" size="18" />
-                  Restore
-                </button>
-              </li>
-            </ul>
+              <button
+                tabindex="0"
+                class="btn btn-sm btn-ghost hover:bg-base-100 p-2"
+                type="button"
+                @click="isActionsMenuOpen = !isActionsMenuOpen"
+              >
+                <Icon name="tabler:dots-vertical" size="18" />
+              </button>
+              <button
+                v-if="isActionsMenuOpen"
+                tabindex="-1"
+                class="fixed inset-0 z-20 cursor-default bg-black/35"
+                type="button"
+                aria-label="Close menu"
+                @click="closeActionsMenu"
+              />
+              <div
+                v-if="isActionsMenuOpen"
+                tabindex="-1"
+                class="dropdown-content menu bg-base-100 rounded-box z-100 mb-2 w-52 shadow-sm border-2 border-secondary"
+              >
+                <ul>
+                  <li v-if="isManager && !user?.archivedAt">
+                    <button
+                      class="btn btn-sm btn-ghost"
+                      type="button"
+                      :disabled="isSaving"
+                      @click="isArchiveDialogOpen = true"
+                    >
+                      <Icon name="tabler:archive" size="18" />
+                      Archive
+                    </button>
+                  </li>
+                  <li v-if="isManager && user?.archivedAt">
+                    <button
+                      class="btn btn-sm btn-ghost"
+                      type="button"
+                      :disabled="isSaving"
+                      @click="restoreUser"
+                    >
+                      <Icon name="tabler:restore" size="18" />
+                      Restore
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
-        </h2>
+        </div>
         <div v-if="user?.archivedAt" class="badge badge-warning">
           Archived
         </div>
