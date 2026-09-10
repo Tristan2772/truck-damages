@@ -151,59 +151,77 @@ onBeforeRouteUpdate((to) => {
       <div class="flex flex-col">
         <div class="flex flex-col gap-2 items-center text-left">
           <div class="w-full flex flex-col gap-2 justify-center items-start pt-5 px-4">
-            <h2 class="text-2xl flex items-center gap-2 text-balance">
-              <span>{{ truck.name }}</span>
-              <div
-                v-if="isManager"
-                ref="actionsMenu"
-                class="dropdown dropdown-bottom dropdown-start"
-                :class="{ 'dropdown-open': isActionsMenuOpen }"
-                @focusout="closeActionsMenuIfFocusLeaves"
-              >
-                <button
-                  tabindex="0"
-                  class="btn btn-sm btn-ghost hover:bg-base-100 p-2"
-                  type="button"
-                  @click="isActionsMenuOpen = !isActionsMenuOpen"
+            <div class="flex items-center">
+              <h2 class="text-2xl flex items-center gap-2 text-balance">
+                <span>{{ truck.name }}</span>
+              </h2>
+              <div class="flex">
+                <div
+                  v-if="isManager"
+                  ref="actionsMenu"
+                  class="dropdown dropdown-bottom"
+                  :class="{ 'dropdown-open': isActionsMenuOpen, 'dropdown-close': !isActionsMenuOpen }"
+                  @focusout="closeActionsMenuIfFocusLeaves"
                 >
-                  <Icon name="tabler:dots-vertical" size="18" />
-                </button>
-                <ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm mb-2  border-2 border-secondary">
-                  <li v-if="!truck.archivedAt">
-                    <NuxtLink
-                      :to="{
-                        name: 'damages-trucks-vin-edit',
-                        params: {
-                          vin: route.params.vin,
-                        },
-                      }"
-                      @click="closeActionsMenu"
-                    >
-                      <AppTruckSettingsIcon />
-                      Edit
-                    </NuxtLink>
-                  </li>
-                  <li v-if="!truck.archivedAt">
-                    <NuxtLink to="" @click="openArchiveDialog">
-                      <Icon name="tabler:archive" size="24" />
-                      Archive
-                    </NuxtLink>
-                  </li>
-                  <li v-if="!truck.archivedAt">
-                    <NuxtLink to="" @click="openDialog">
-                      <Icon name="tabler:trash-x-filled" size="24" />
-                      Delete
-                    </NuxtLink>
-                  </li>
-                  <li v-if="truck.archivedAt">
-                    <NuxtLink to="" @click="restoreTruck">
-                      <Icon name="tabler:restore" size="24" />
-                      Restore
-                    </NuxtLink>
-                  </li>
-                </ul>
+                  <button
+                    tabindex="0"
+                    class="btn btn-sm btn-ghost hover:bg-base-100 p-2"
+                    type="button"
+                    @click="isActionsMenuOpen = !isActionsMenuOpen"
+                  >
+                    <Icon name="tabler:dots-vertical" size="18" />
+                  </button>
+                  <button
+                    v-if="isActionsMenuOpen"
+                    tabindex="-1"
+                    class="fixed inset-0 z-20 cursor-default bg-black/35"
+                    type="button"
+                    aria-label="Close menu"
+                    @click.capture="closeActionsMenu"
+                  />
+                  <div
+                    v-if="isActionsMenuOpen"
+                    tabindex="-1"
+                    class="dropdown-content menu bg-base-100 rounded-box z-100 mb-2 w-52 shadow-sm border-2 border-secondary"
+                  >
+                    <ul>
+                      <li v-if="!truck.archivedAt">
+                        <NuxtLink
+                          :to="{
+                            name: 'damages-trucks-vin-edit',
+                            params: {
+                              vin: route.params.vin,
+                            },
+                          }"
+                          @click="closeActionsMenu"
+                        >
+                          <AppTruckSettingsIcon />
+                          Edit
+                        </NuxtLink>
+                      </li>
+                      <li v-if="!truck.archivedAt">
+                        <NuxtLink to="" @click="openArchiveDialog">
+                          <Icon name="tabler:archive" size="24" />
+                          Archive
+                        </NuxtLink>
+                      </li>
+                      <li v-if="!truck.archivedAt">
+                        <NuxtLink to="" @click="openDialog">
+                          <Icon name="tabler:trash-x-filled" size="24" />
+                          Delete
+                        </NuxtLink>
+                      </li>
+                      <li v-if="truck.archivedAt">
+                        <NuxtLink to="" @click="restoreTruck">
+                          <Icon name="tabler:restore" size="24" />
+                          Restore
+                        </NuxtLink>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </div>
-            </h2>
+            </div>
             <p
               class="text-sm mb-4 py-2 pb-0 text-pretty"
             >

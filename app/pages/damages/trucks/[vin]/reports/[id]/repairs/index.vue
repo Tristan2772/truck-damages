@@ -167,12 +167,12 @@ onBeforeUnmount(() => {
               </div>
             </template>
           </div>
-          <div v-if="isManager && !isTruckArchived" class="flex gap-2">
+          <div v-if="isManager && !isTruckArchived" class="flex">
             <div
               v-if="canManageReport"
               :ref="element => setActionsMenu(repair.id, element)"
               class="dropdown dropdown-bottom dropdown-end"
-              :class="{ 'dropdown-open': openActionsMenuId === repair.id }"
+              :class="{ 'dropdown-open': openActionsMenuId === repair.id, 'dropdown-close': openActionsMenuId !== repair.id }"
               @focusout="closeActionsMenuIfFocusLeaves"
             >
               <button
@@ -183,31 +183,44 @@ onBeforeUnmount(() => {
               >
                 <Icon name="tabler:dots-vertical" size="18" />
               </button>
-              <ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm mb-2 border-2 border-secondary">
-                <li v-if="canManageReport">
-                  <NuxtLink
-
-                    :to="{
-                      name: 'damages-trucks-vin-reports-id-repairs-repairId-edit',
-                      params: {
-                        vin: route.params.vin,
-                        id: report.id,
-                        repairId: repair.id,
-                      },
-                    }"
-                    @click="closeActionsMenu"
-                  >
-                    <AppWrenchSettingsIcon />
-                    Edit Repair
-                  </NuxtLink>
-                </li>
-                <li v-if="canManageReport">
-                  <button type="button" @click="openDialog(repair.id)">
-                    <Icon name="tabler:trash-x-filled" size="24" />
-                    Delete Repair
-                  </button>
-                </li>
-              </ul>
+              <button
+                v-if="openActionsMenuId === repair.id"
+                tabindex="-1"
+                class="fixed inset-0 z-20 cursor-default bg-black/35"
+                type="button"
+                aria-label="Close menu"
+                @click="closeActionsMenu"
+              />
+              <div
+                v-if="openActionsMenuId === repair.id"
+                tabindex="-1"
+                class="dropdown-content menu bg-base-100 rounded-box z-100 mb-2 w-52 shadow-sm border-2 border-secondary"
+              >
+                <ul>
+                  <li v-if="canManageReport">
+                    <NuxtLink
+                      :to="{
+                        name: 'damages-trucks-vin-reports-id-repairs-repairId-edit',
+                        params: {
+                          vin: route.params.vin,
+                          id: report.id,
+                          repairId: repair.id,
+                        },
+                      }"
+                      @click="closeActionsMenu"
+                    >
+                      <AppWrenchSettingsIcon />
+                      Edit Repair
+                    </NuxtLink>
+                  </li>
+                  <li v-if="canManageReport">
+                    <button type="button" @click="openDialog(repair.id)">
+                      <Icon name="tabler:trash-x-filled" size="24" />
+                      Delete Repair
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>

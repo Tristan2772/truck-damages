@@ -175,7 +175,7 @@ onBeforeUnmount(() => {
             <button
               v-if="isActionsMenuOpen"
               tabindex="-1"
-              class="fixed inset-0 z-0 cursor-default"
+              class="fixed inset-0 z-20 cursor-default bg-black/35"
               type="button"
               aria-label="Close menu"
               @click="closeActionsMenu"
@@ -183,7 +183,7 @@ onBeforeUnmount(() => {
             <div
               v-if="isActionsMenuOpen"
               tabindex="-1"
-              class="dropdown-content bg-base-100 rounded-box z-1 mb-2 flex flex-row w-max shadow-sm border-2 border-secondary"
+              class="dropdown-content bg-base-100 rounded-box z-100 mb-2 flex flex-row w-max shadow-sm border-2 border-secondary"
             >
               <ul class="menu">
                 <li class="menu-title">
