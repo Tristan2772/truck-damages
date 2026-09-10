@@ -180,7 +180,7 @@ onBeforeUnmount(() => {
             <button
               v-if="isActionsMenuOpen"
               tabindex="-1"
-              class="fixed inset-0 z-20 cursor-default"
+              class="fixed inset-0 z-20 cursor-default bg-black/35"
               type="button"
               aria-label="Close menu"
               @click="closeActionsMenu"
