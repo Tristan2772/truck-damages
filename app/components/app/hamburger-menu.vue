@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { isManagerEmail } from "~/utils/permissions";
+import { isManagerUser } from "~/utils/permissions";
 
 const isOpen = ref(false);
 const authStore = useAuthStore();
 const route = useRoute();
 
-const isManager = computed(() => isManagerEmail(authStore.user?.email));
+const isManager = computed(() => isManagerUser(authStore.user));
 
 const menuRoot = useTemplateRef<HTMLDivElement>("menuRoot");
 

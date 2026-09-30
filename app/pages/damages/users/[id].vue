@@ -3,7 +3,7 @@ import type { FetchError } from "ofetch";
 
 import type { SelectUser } from "~/lib/db/schema";
 
-import { isManagerEmail } from "~/utils/permissions";
+import { isManagerUser } from "~/utils/permissions";
 import { getReportRecency } from "~/utils/report-recency";
 
 const { $csrfFetch } = useNuxtApp();
@@ -35,7 +35,7 @@ const { data: reports, error, status } = await useFetch(
 );
 
 const loading = computed(() => status.value === "pending");
-const isManager = computed(() => isManagerEmail(authStore.user?.email));
+const isManager = computed(() => isManagerUser(authStore.user));
 const isArchiveDialogOpen = ref(false);
 const isSaving = ref(false);
 const archiveError = ref("");

@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import type { FetchError } from "ofetch";
 
-import { isManagerEmail } from "~/utils/permissions";
+import { isManagerUser } from "~/utils/permissions";
 
 const route = useRoute();
 const trucksStore = useTrucksStore();
 const authStore = useAuthStore();
 const { currentReport: report, currentReportStatus: status } = storeToRefs(trucksStore);
-const isManager = computed(() => isManagerEmail(authStore.user?.email));
+const isManager = computed(() => isManagerUser(authStore.user));
 const isTruckArchived = computed(() => Boolean(trucksStore.currentTruck?.archivedAt));
 const isOpen = ref(false);
 const deletingRepairId = ref<number | null>(null);

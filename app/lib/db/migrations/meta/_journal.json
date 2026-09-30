@@ -57,6 +57,13 @@
       "when": 1788566400000,
       "tag": "0007_create_repairs",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790467200000,
+      "tag": "0008_add_is_manager_to_users",
+      "breakpoints": true
     }
   ]
 }

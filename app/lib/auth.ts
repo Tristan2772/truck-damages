@@ -1,5 +1,3 @@
-import type { User } from "better-auth";
-
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError, createAuthMiddleware } from "better-auth/api";
@@ -10,7 +8,7 @@ import db from "@/lib/db/index";
 import env from "../lib/env";
 import { findUserByEmail } from "./db/queries/users";
 
-export type userWithId = Omit<User, "id"> & {
+export type userWithId = Omit<typeof auth.$Infer.Session.user, "id"> & {
   id: number;
 };
 
@@ -31,6 +29,16 @@ const trustedOrigins = Array.from(new Set([
 ]));
 
 export const auth = betterAuth({
+  user: {
+    additionalFields: {
+      isManager: {
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+        input: false,
+      },
+    },
+  },
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
       if (ctx.path !== "/sign-in/email" || typeof ctx.body?.email !== "string") {

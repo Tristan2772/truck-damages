@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { SelectTruckReportImage } from "~/lib/db/schema";
 
-import { isManagerEmail } from "~/utils/permissions";
+import { isManagerUser } from "~/utils/permissions";
 
 const props = defineProps<{
   reportId: number;
@@ -21,7 +21,7 @@ const props = defineProps<{
 const authStore = useAuthStore();
 const route = useRoute();
 const reportVin = computed(() => props.vin || route.params.vin?.toString());
-const isManager = computed(() => isManagerEmail(authStore.user?.email));
+const isManager = computed(() => isManagerUser(authStore.user));
 </script>
 
 <template>

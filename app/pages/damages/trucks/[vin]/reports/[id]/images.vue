@@ -3,14 +3,14 @@ import { FetchError } from "ofetch";
 
 import type { SelectTruckReportImage } from "~/lib/db/schema";
 
-import { isManagerEmail } from "~/utils/permissions";
+import { isManagerUser } from "~/utils/permissions";
 import { uploadTruckReportImage } from "~/utils/upload-truck-report-image";
 
 const truckStore = useTrucksStore();
 const { currentReport: report } = storeToRefs(truckStore);
 const authStore = useAuthStore();
 
-const isManager = computed(() => isManagerEmail(authStore.user?.email));
+const isManager = computed(() => isManagerUser(authStore.user));
 const isTruckArchived = computed(() => Boolean(truckStore.currentTruck?.archivedAt));
 const canUploadImages = computed(() => {
   if (!report.value || !authStore.user || isTruckArchived.value) {

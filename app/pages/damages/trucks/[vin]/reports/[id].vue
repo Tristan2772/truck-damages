@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { FetchError } from "ofetch";
 
-import { isManagerEmail } from "~/utils/permissions";
+import { isManagerUser } from "~/utils/permissions";
 
 const route = useRoute();
 const truckStore = useTrucksStore();
@@ -16,7 +16,7 @@ const isDeleting = ref(false);
 const deleteError = ref("");
 const loading = computed(() => status.value === "pending" || isDeleting.value);
 const errorMessage = computed(() => error.value?.statusMessage || deleteError.value);
-const isManager = computed(() => isManagerEmail(authStore.user?.email));
+const isManager = computed(() => isManagerUser(authStore.user));
 const isTruckArchived = computed(() => Boolean(truckStore.currentTruck?.archivedAt));
 
 const canManageReport = computed(() => {

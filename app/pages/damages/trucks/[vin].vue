@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { FetchError } from "ofetch";
 
-import { isManagerEmail } from "~/utils/permissions";
+import { isManagerUser } from "~/utils/permissions";
 import { getReportRecency } from "~/utils/report-recency";
 
 const truckStore = useTrucksStore();
@@ -13,7 +13,7 @@ const isOpen = ref(false);
 const isArchiveDialogOpen = ref(false);
 const isActionsMenuOpen = ref(false);
 const actionsMenu = ref<HTMLElement | null>(null);
-const isManager = computed(() => isManagerEmail(authStore.user?.email));
+const isManager = computed(() => isManagerUser(authStore.user));
 const reportsWithRecency = computed(() => (truck.value?.truckReports || []).map((report, index, allReports) => {
   const recency = getReportRecency(report.createdAt);
   const previousReport = allReports[index - 1];
