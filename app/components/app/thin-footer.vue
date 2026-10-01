@@ -1,9 +1,9 @@
+<script setup lang="ts">
+const currentYear = ref(new Date().getFullYear());
+</script>
+
 <template>
   <footer class="flex justify-center items-center py-6">
-    &copy; 2026&nbsp;<a
-      href="https://www.tristan-carter.dev"
-      target="_blank"
-      class="hover:underline"
-    >Tristan Carter</a>
+    &copy; {{ currentYear }}&nbsp;Mark Logistics, LLC
   </footer>
 </template>
