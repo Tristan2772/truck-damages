@@ -9,6 +9,8 @@ const props = defineProps<{
 
 const { value, handleChange } = useField<number | null>(() => props.name);
 
+const scrollable = computed(() => props.options.length > 5);
+
 function onSelectChange(event: Event) {
   const target = event.target as HTMLSelectElement;
   handleChange(target.value);
@@ -22,6 +24,7 @@ function onSelectChange(event: Event) {
     </legend>
     <select
       class="select"
+      :class="{ 'max-h-40 overflow-y-auto': scrollable }"
       :value="value"
       :disabled="props.disabled"
       @change="onSelectChange"
